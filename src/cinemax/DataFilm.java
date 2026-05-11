@@ -1,11 +1,11 @@
 package cinemax;
 
-public class DataNascita {
+public class DataFilm {
     private int giorno;
     private int mese;
     private int anno;
 
-    public DataNascita (int g, int m, int a) throws DateFormatException {
+    public DataFilm (int g, int m, int a) throws DateFormatException {
         boolean v = verifyFormat(g, m, a);
         if(v) {
             this.giorno = g;
@@ -27,7 +27,7 @@ public class DataNascita {
         return g <= giorniPerMese[m - 1];
     }
 
-    public boolean isAfter(DataNascita altra) {
+    public boolean isAfter(DataFilm altra) {
         if (this.anno > altra.anno)
             return true;
         if (this.anno == altra.anno && this.mese > altra.mese)
@@ -38,7 +38,7 @@ public class DataNascita {
         return false;
     }
 
-    public boolean isBefore(DataNascita altra) {
+    public boolean isBefore(DataFilm altra) {
         if (this.anno < altra.anno)
             return true;
         if (this.anno == altra.anno && this.mese < altra.mese)
@@ -84,10 +84,10 @@ public class DataNascita {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof DataNascita))
+        if (!(o instanceof DataFilm))
             return false;
         
-        DataNascita d = (DataNascita) o;
+        DataFilm d = (DataFilm) o;
         if(this.giorno == d.giorno && this.mese == d.mese && this.anno == d.anno) {
             return true;
         } else {
