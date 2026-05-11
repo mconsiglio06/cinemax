@@ -1,0 +1,9 @@
+nome,cognome,username,password,data,domicilio,ruolo
+Mario,Rossi,mipiaceilcinema1980,pass123,1980-05-15,Varese,proiezionista
+Luigi,Cupero,stanleykubrick2,pass456,1985-02-20,Como,proiezionista
+Marco,Bianchi,whitemark,pass789,1990-11-30,Varese,bigliettaio
+Sara,Casagrande,quartooggiarooo,pass101,1992-04-10,Milano,bigliettaio
+Anna,Gialli,yellow88,pass202,1988-07-25,Busto Arsizio,bigliettaio
+Luca,De Sanctis,luchinogalla,pass303,2000-01-01,Gallarate,bigliettaio
+Elena,Brognara,big5,pass404,1998-12-12,Varese,bigliettaio
+Paolo,Stagni,nonquellodellerane,pass505,2002-06-20,Milano,cliente
