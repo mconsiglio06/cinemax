@@ -3,20 +3,18 @@ package cinemax;
 import java.util.LinkedList;
 
 public class Cliente extends Utente {
+    private LinkedList<Prenotazione> miePrenotazioni;
 
     public Cliente(String nome, String cognome, String username, String password, DataFilm dataNascita, String luogo) {
-        // Passiamo Ruolo.CLIENTE al costruttore del padre
         super(nome, cognome, username, password, dataNascita, luogo, Ruolo.CLIENTE);
+        this.miePrenotazioni = new LinkedList<>();
     }
 
-    public void prenota(Proiezione p, int posti) {
-        // Logica per creare una prenotazione
+    public void addPrenotazione(Prenotazione p) {
+        this.miePrenotazioni.add(p);
     }
 
     public LinkedList<Prenotazione> vediPrenotazioni() {
-        // Ritorna la lista delle prenotazioni di questo cliente
-        return new LinkedList<>();
+        return miePrenotazioni;
     }
-    
-    // toString rimosso o aggiornato per usare i campi del padre
 }
