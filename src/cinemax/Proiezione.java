@@ -1,49 +1,131 @@
 package cinemax;
 
+import java.util.LinkedList;
+
 public class Proiezione {
-    private Film film;
-    private DataFilm data;
-    private Ora ora;
-    private double prezzo;
-    // Matrice 20 file x 10 posti
-    private boolean[][] sala = new boolean[20][10]; 
-    private int postiDisponibili = 200;
+    protected Film film;
+    protected Date dataProiezione;
+    protected Time oraProiezione;
+    protected double prezzo;
+    protected boolean[][] sala = new boolean[10][20];
 
-    public Proiezione(Film film, DataFilm data, Ora ora, double prezzo) {
+    public Proiezione(Film film, Date dataProiezione, Time oraProiezione, double prezzo) {
         this.film = film;
-        this.data = data;
-        this.ora = ora;
+        this.dataProiezione = dataProiezione;
+        this.oraProiezione = oraProiezione;
         this.prezzo = prezzo;
-        // Inizialmente tutti i posti sono liberi (false)
     }
 
-    // Metodo per visualizzare la sala a schermo
-    public void mostraSala() {
-        System.out.println("\n--- SCHERMO ---");
-        for (int i = 0; i < sala.length; i++) {
-            System.out.print("Fila " + (i + 1) + (i < 9 ? " : " : ": "));
-            for (int j = 0; j < sala[i].length; j++) {
-                // [ ] posto libero, [X] posto occupato
-                System.out.print(sala[i][j] ? "[X] " : "[ ] ");
+    public Film getFilm() {
+        return film;
+    }
+
+    public Date getDataProiezione() {
+        return dataProiezione;
+    }
+
+    public Time getOraProiezione() {
+        return oraProiezione;
+    }
+
+    public double getPrezzo() {
+        return prezzo;
+    }
+
+    public boolean[][] getSala() {
+        return sala;
+    }
+
+    public int getAvailableSeatsCount() {
+        int count = 0;
+        for (boolean[] rowSeats : sala) {
+            for (boolean seat : rowSeats) {
+                if (!seat) {
+                    count++;
+                }
             }
-            System.out.println();
+        }
+        return count;
+    }
+
+    public boolean isSeatAvailable(int row, int col) {
+        if (!isValidSeat(row, col)) {
+            return false;
+        }
+        return !sala[row - 1][col - 1];
+    }
+
+    public boolean reserveSeat(int row, int col) {
+        if (!isValidSeat(row, col) || sala[row - 1][col - 1]) {
+            return false;
+        }
+        sala[row - 1][col - 1] = true;
+        return true;
+    }
+
+    public boolean reserveSeats(LinkedList<Posto> posti) {
+        for (Posto seat : posti) {
+            int row = seat.getRowIndex();
+            int col = seat.getNumero();
+            if (!isSeatAvailable(row, col)) {
+                return false;
+            }
+        }
+        for (Posto seat : posti) {
+            int row = seat.getRowIndex();
+            int col = seat.getNumero();
+            sala[row - 1][col - 1] = true;
+        }
+        return true;
+    }
+
+    public void releaseSeats(LinkedList<Posto> posti) {
+        for (Posto seat : posti) {
+            int row = seat.getRowIndex();
+            int col = seat.getNumero();
+            if (isValidSeat(row, col)) {
+                sala[row - 1][col - 1] = false;
+            }
         }
     }
 
-    // Metodo per prenotare un posto specifico
-    public void prenotaPosto(int fila, int colonna) throws PostoOccupatoException {
-        if (fila < 0 || fila >= 20 || colonna < 0 || colonna >= 10) {
-            throw new IndexOutOfBoundsException("Coordinate posto non valide.");
-        }
-        if (sala[fila][colonna]) {
-            throw new PostoOccupatoException("Il posto selezionato è già occupato.");
-        }
-        sala[fila][colonna] = true;
-        postiDisponibili--;
+    private boolean isValidSeat(int row, int col) {
+        return row >= 1 && row <= sala.length && col >= 1 && col <= sala[0].length;
     }
 
-    // Getter necessari
-    public Film getFilm() { return film; }
-    public DataFilm getData() { return data; }
-    public int getPostiDisponibili() { return postiDisponibili; }
+    public String renderSala() {
+        StringBuilder sb = new StringBuilder();
+        for (int row = 0; row < sala.length; row++) {
+            char rowLabel = (char) ('A' + row);
+            sb.append("Fila ").append(rowLabel).append(": ");
+            for (int col = 0; col < sala[row].length; col++) {
+                sb.append(sala[row][col] ? "[X]" : "[ ]");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return film.toString() + "\nProiezione: " + dataProiezione + " " + oraProiezione + "\nPrezzo: €" + prezzo;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Proiezione)) return false;
+        Proiezione that = (Proiezione) o;
+        return film.getTitolo().equalsIgnoreCase(that.film.getTitolo()) &&
+               dataProiezione.equals(that.dataProiezione) &&
+               oraProiezione.equals(that.oraProiezione);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = film.getTitolo().toLowerCase().hashCode();
+        result = 31 * result + dataProiezione.hashCode();
+        result = 31 * result + oraProiezione.hashCode();
+        return result;
+    }
 }

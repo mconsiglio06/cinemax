@@ -1,63 +1,57 @@
-import cinemax.*;
-import java.util.*;
+import java.util.Scanner;
 
 public class MainCinemax {
     public static void main(String[] args) {
-        CinemaManager sistema = new CinemaManager();
-            Scanner tastiera = new Scanner(System.in);
-            int scelta = -1;
+        System.out.println("---- CineMax - All'avanguardia del cinema ----");
+        System.out.println("Effettua l'accesso per prenotare i tuoi film preferiti..." +
+            "\nOppure accedi come amministratore per gestirli!"
+        );
 
-            System.out.println("=== BENVENUTO IN CINEMAX ===");
+        System.out.println("\n--------" +
+            "\n1 - Accedi come cliente" +
+            "\n2 - Accedi come amministratore" +
+            "\n3 - Registrati" +
+            "\n------------------------------" +
+            "\n4 - Entra come ospite" +
+            "\n0 - Chiudi il programma"
+        );
 
-            do {
-                System.out.println("\n1. Login");
-                System.out.println("2. Registrati (Nuovo Cliente)");
-                System.out.println("0. Esci");
-                System.out.print("Scegli un'opzione: ");
-                
-                scelta = tastiera.nextInt();
-                tastiera.nextLine(); // Pulizia buffer dopo nextInt()
+        Scanner sc = new Scanner(System.in);
 
-                switch (scelta) {
-                    case 1:
-                        System.out.print("Username: ");
-                        String user = tastiera.nextLine();
-                        System.out.print("Password: ");
-                        String pass = tastiera.nextLine();
+        int init = sc.nextInt();
 
-                        if (sistema.login(user, pass)) {
-                            Utente corrente = sistema.getUtenteCorrente();
-                            System.out.println("\nAccesso eseguito come " + corrente.getRuolo());
-                            // Qui in futuro chiameremo i menu specifici (Cliente/Personale)
-                        } else {
-                            System.out.println("Credenziali errate.");
-                        }
-                        break;
+        while(init < 0 || init > 4) {
+            System.out.println("Scelta non valida, riprova!");
+            init = sc.nextInt();
+        }
 
-                    case 2:
-                        System.out.println("--- MODULO REGISTRAZIONE ---");
-                        System.out.print("Nome: "); String n = tastiera.nextLine();
-                        System.out.print("Cognome: "); String c = tastiera.nextLine();
-                        System.out.print("Username: "); String u = tastiera.nextLine();
-                        System.out.print("Password: "); String p = tastiera.nextLine();
-                        System.out.print("Giorno nascita: "); int g = tastiera.nextInt();
-                        System.out.print("Mese nascita: "); int m = tastiera.nextInt();
-                        System.out.print("Anno nascita: "); int a = tastiera.nextInt();
-                        tastiera.nextLine();
-                        System.out.print("Luogo: "); String l = tastiera.nextLine();
+        switch (init) {
+            case 1:
+                // Logica per accedere come cliente
+                System.out.println("(Lasciare il campo vuoto per annullare l'azione)");
+                System.out.print("Username: ");
+                String username = sc.next();
+                System.out.println("(Lasciare il campo vuoto per annullare l'azione)");
+                System.out.print("Password: ");
+                String password = sc.next();
 
-                        sistema.registraNuovoCliente(n, c, u, p, g, m, a, l);
-                        break;
+                System.out.println("Accesso effettuato con successo! Benvenuto, " + username + "!");
 
-                    case 0:
-                        System.out.println("Arrivederci!");
-                        break;
+                break;
+            case 2:
+                // Logica per accedere come amministratore
+                break;
+            case 3:
+                // Logica per registrarsi
+                break;
+            case 4:
+                // Logica per entrare come ospite
+                break;
+            case 0:
+                System.out.println("Grazie per aver utilizzato CineMax! Arrivederci!");
+                sc.close();
+                return;
+        }
 
-                    default:
-                        System.out.println("Opzione non valida.");
-                }
-            } while (scelta != 0);
-
-            tastiera.close();
     }
 }

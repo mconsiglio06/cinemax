@@ -16,7 +16,7 @@ public enum Ruolo {
     }
 
     // Metodo per verificare se è un utente con privilegi
-    public boolean haPermessi() {
+    public boolean hasPowers() {
         return power;
     }
 

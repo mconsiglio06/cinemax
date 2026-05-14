@@ -1,11 +1,18 @@
 package cinemax;
 
-public class DataFilm {
+import java.time.LocalDate;
+
+public class Date {
     private int giorno;
     private int mese;
     private int anno;
 
-    public DataFilm (int g, int m, int a) throws DateFormatException {
+    public static Date today() throws DateFormatException {
+        LocalDate localDate = LocalDate.now();
+        return new Date(localDate.getDayOfMonth(), localDate.getMonthValue(), localDate.getYear());
+    }
+
+    public Date (int g, int m, int a) throws DateFormatException {
         boolean v = verifyFormat(g, m, a);
         if(v) {
             this.giorno = g;
@@ -27,7 +34,7 @@ public class DataFilm {
         return g <= giorniPerMese[m - 1];
     }
 
-    public boolean isAfter(DataFilm altra) {
+    public boolean isAfter(Date altra) {
         if (this.anno > altra.anno)
             return true;
         if (this.anno == altra.anno && this.mese > altra.mese)
@@ -38,7 +45,7 @@ public class DataFilm {
         return false;
     }
 
-    public boolean isBefore(DataFilm altra) {
+    public boolean isBefore(Date altra) {
         if (this.anno < altra.anno)
             return true;
         if (this.anno == altra.anno && this.mese < altra.mese)
@@ -49,6 +56,7 @@ public class DataFilm {
         return false;
     }
 
+    
     //getters and setters
     
 
@@ -84,10 +92,10 @@ public class DataFilm {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof DataFilm))
+        if (!(o instanceof Date)) 
             return false;
         
-        DataFilm d = (DataFilm) o;
+        Date d = (Date) o;
         if(this.giorno == d.giorno && this.mese == d.mese && this.anno == d.anno) {
             return true;
         } else {
