@@ -1,6 +1,7 @@
 package cinemax;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.LinkedList;
 
 public class Manager {
@@ -14,7 +15,26 @@ public class Manager {
     LinkedList<Proiezione> proiezioni = new LinkedList<>();
 
     public Manager() {
-        // Costruttore vuoto. La gestione utenti e il caricamento da file possono essere aggiunti in futuro.
+        initializePrenotazioneIdCounter();
+    }
+
+    private void initializePrenotazioneIdCounter() {
+        File file = new File(PRENOTAZIONI_FILE);
+        if (!file.exists()) {
+            return;
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line = reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+                int id = parsePrenotazioneId(line);
+                Prenotazione.ensureIdCounterAtLeast(id);
+            }
+        } catch (IOException e) {
+            System.out.println("Errore durante l'inizializzazione degli ID delle prenotazioni: " + e.getMessage());
+        }
     }
 
     /**
@@ -22,25 +42,36 @@ public class Manager {
      * @param utente l'utente da salvare
      */
     public void saveUtente(Utente utente) {
-        try (FileWriter fw = new FileWriter(UTENTI_FILE, true);
-             BufferedWriter bw = new BufferedWriter(fw)) {
-            
-            String passwordCifrata = SecurityUtils.hashPassword(utente.getPassword());
-            String line = utente.getNome() + "," + 
-                         utente.getCognome() + "," + 
-                         utente.getUsername() + "," + 
-                         passwordCifrata + "," + 
-                         utente.getDataNascita().getGiorno() + "," + 
-                         utente.getDataNascita().getMese() + "," + 
-                         utente.getDataNascita().getAnno() + "," + 
-                         utente.getLuogo() + "," + 
-                         utente.getRuolo();
-            
-            bw.write(line);
-            bw.newLine();
-            System.out.println("Utente salvato con successo: " + utente.getUsername());
+        try {
+            ensureUtentiHeader();
+            try (FileWriter fw = new FileWriter(UTENTI_FILE, true);
+                 BufferedWriter bw = new BufferedWriter(fw)) {
+                String passwordCifrata = SecurityUtils.hashPassword(utente.getPassword());
+                String line = quote(utente.getNome()) + "," + 
+                             quote(utente.getCognome()) + "," + 
+                             utente.getUsername() + "," + 
+                             passwordCifrata + "," + 
+                             utente.getDataNascita().getGiorno() + "," + 
+                             utente.getDataNascita().getMese() + "," + 
+                             utente.getDataNascita().getAnno() + "," + 
+                             quote(utente.getLuogo()) + "," + 
+                             utente.getRuolo();
+                bw.write(line);
+                bw.newLine();
+                System.out.println("Utente salvato con successo: " + utente.getUsername());
+            }
         } catch (IOException e) {
             System.out.println("Errore durante il salvataggio dell'utente: " + e.getMessage());
+        }
+    }
+
+    private void ensureUtentiHeader() throws IOException {
+        File file = new File(UTENTI_FILE);
+        if (!file.exists() || file.length() == 0) {
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
+                bw.write("nome,cognome,username,password,giorno,mese,anno,luogo,ruolo");
+                bw.newLine();
+            }
         }
     }
 
@@ -51,8 +82,16 @@ public class Manager {
      */
     public boolean usernameExists(String username) {
         try (BufferedReader reader = new BufferedReader(new FileReader(UTENTI_FILE))) {
-            reader.readLine(); // salta intestazione
-            String line;
+            String line = reader.readLine();
+            if (line == null) {
+                return false;
+            }
+            if (!isHeaderLine(line)) {
+                String[] field = splitCsv(line);
+                if (field.length > 2 && field[2].equals(username)) {
+                    return true;
+                }
+            }
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) {
                     continue;
@@ -73,19 +112,27 @@ public class Manager {
             return null;
         }
         try (BufferedReader reader = new BufferedReader(new FileReader(UTENTI_FILE))) {
-            reader.readLine(); // salta intestazione
-            String line;
-            while ((line = reader.readLine()) != null) {
+            String line = reader.readLine();
+            if (line == null) {
+                return null;
+            }
+            if (isHeaderLine(line)) {
+                line = reader.readLine();
+            }
+            while (line != null) {
                 if (line.trim().isEmpty()) {
+                    line = reader.readLine();
                     continue;
                 }
                 String[] field = splitCsv(line);
                 if (field.length < 9) {
+                    line = reader.readLine();
                     continue;
                 }
                 String savedUsername = field[2];
                 String savedHash = field[3];
                 if (!savedUsername.equals(username)) {
+                    line = reader.readLine();
                     continue;
                 }
                 String requestedHash = SecurityUtils.hashPassword(password);
@@ -106,6 +153,11 @@ public class Manager {
             System.out.println("Errore durante l'autenticazione: " + e.getMessage());
         }
         return null;
+    }
+
+    private boolean isHeaderLine(String line) {
+        String[] field = splitCsv(line);
+        return field.length > 2 && field[2].equalsIgnoreCase("username");
     }
 
     private Utente buildUtente(String nome, String cognome, String username, String password, Date dataNascita, String luogo, Ruolo ruolo) {
@@ -149,6 +201,12 @@ public class Manager {
 
     public LinkedList<Prenotazione> getPrenotazioniByUser(String username) {
         LinkedList<Prenotazione> elenco = new LinkedList<>();
+        try {
+            ensurePrenotazioniHeader();
+        } catch (IOException e) {
+            System.out.println("Errore durante l'inizializzazione del file prenotazioni: " + e.getMessage());
+            return elenco;
+        }
         try (BufferedReader reader = new BufferedReader(new FileReader(PRENOTAZIONI_FILE))) {
             reader.readLine(); // intestazione
             String line;
@@ -233,6 +291,26 @@ public class Manager {
         return elenco;
     }
 
+    public LinkedList<Prenotazione> getPrenotazioni() {
+        LinkedList<Prenotazione> elenco = new LinkedList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(PRENOTAZIONI_FILE))) {
+            reader.readLine();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+                Prenotazione p = parsePrenotazioneFromCsv(line);
+                if (p != null && p.getProiezione() != null) {
+                    elenco.add(p);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Errore durante il caricamento delle prenotazioni: " + e.getMessage());
+        }
+        return elenco;
+    }
+
     public Prenotazione getPrenotazioneById(int id) {
         try (BufferedReader reader = new BufferedReader(new FileReader(PRENOTAZIONI_FILE))) {
             reader.readLine();
@@ -290,6 +368,54 @@ public class Manager {
             totale += prenotazione.getSpesa();
         }
         return totale;
+    }
+
+    public double getWeeklyRevenue(Date data) {
+        if (data == null) {
+            return 0;
+        }
+        LocalDate reference = toLocalDate(data);
+        LocalDate startOfWeek = reference.minusDays(reference.getDayOfWeek().getValue() - 1);
+        LocalDate endOfWeek = startOfWeek.plusDays(6);
+        double totale = 0;
+        for (Prenotazione prenotazione : getPrenotazioni()) {
+            LocalDate dataPrenotazione = toLocalDate(prenotazione.getProiezione().getDataProiezione());
+            if (!dataPrenotazione.isBefore(startOfWeek) && !dataPrenotazione.isAfter(endOfWeek)) {
+                totale += prenotazione.getSpesa();
+            }
+        }
+        return totale;
+    }
+
+    public double getMonthlyRevenue(Date data) {
+        if (data == null) {
+            return 0;
+        }
+        double totale = 0;
+        for (Prenotazione prenotazione : getPrenotazioni()) {
+            Date dataPrenotazione = prenotazione.getProiezione().getDataProiezione();
+            if (dataPrenotazione.getMese() == data.getMese() && dataPrenotazione.getAnno() == data.getAnno()) {
+                totale += prenotazione.getSpesa();
+            }
+        }
+        return totale;
+    }
+
+    public double getYearlyRevenue(Date data) {
+        if (data == null) {
+            return 0;
+        }
+        double totale = 0;
+        for (Prenotazione prenotazione : getPrenotazioni()) {
+            if (prenotazione.getProiezione().getDataProiezione().getAnno() == data.getAnno()) {
+                totale += prenotazione.getSpesa();
+            }
+        }
+        return totale;
+    }
+
+    private LocalDate toLocalDate(Date data) {
+        return LocalDate.of(data.getAnno(), data.getMese(), data.getGiorno());
     }
 
     public boolean[][] getOccupancyMap(Proiezione proiezione) {
@@ -419,7 +545,11 @@ public class Manager {
         return true;
     }
 
-    private boolean isOverlapping(Proiezione nuovaProiezione) {
+    public boolean isOverlapping(Proiezione nuovaProiezione) {
+        return isOverlappingInternal(nuovaProiezione);
+    }
+
+    private boolean isOverlappingInternal(Proiezione nuovaProiezione) {
         for (Proiezione esistente : getProiezioni()) {
             if (sameProiezione(esistente, nuovaProiezione)) {
                 return true;
@@ -461,7 +591,7 @@ public class Manager {
     }
 
     private String buildProiezioneLine(Proiezione proiezione) {
-        return formatFileDate(proiezione.getDataProiezione()) + " " + proiezione.getOraProiezione() + "," +
+        return quote(formatFileDate(proiezione.getDataProiezione()) + " " + proiezione.getOraProiezione()) + "," +
                quote(proiezione.getFilm().getTitolo()) + "," +
                quote(proiezione.getFilm().getGenere()) + "," +
                quote(proiezione.getFilm().getRegista()) + "," +

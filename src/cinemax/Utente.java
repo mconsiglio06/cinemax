@@ -13,10 +13,6 @@ public abstract class Utente {
     protected boolean isAdmin;
     protected boolean isLogged;
     
-    // Timestamp di login per il sistema di timeout
-    protected Time loginTime;
-    protected static final int SESSION_TIMEOUT_MINUTES = 30;
-    
     // Riferimento statico al Manager per salvare gli utenti
     protected static Manager manager;
 
@@ -139,14 +135,8 @@ public abstract class Utente {
      * Registra il timestamp del login usando la classe Time
      */
     public void login() {
-        try {
-            this.loginTime = Time.now();
-            this.isLogged = true;
-            System.out.println("Login effettuato per: " + this.username + " (" + this.ruolo + ")");
-            System.out.println("Sessione valida per " + SESSION_TIMEOUT_MINUTES + " minuti");
-        } catch (TimeFormatException e) {
-            System.out.println("Errore durante il login: " + e.getMessage());
-        }
+        this.isLogged = true;
+        System.out.println("Login effettuato per: " + this.username + " (" + this.ruolo + ")");
     }
 
     /**
@@ -154,53 +144,15 @@ public abstract class Utente {
      */
     public void logout() {
         this.isLogged = false;
-        this.loginTime = null;
         System.out.println("Logout effettuato per: " + this.username);
     }
 
     /**
      * Verifica se la sessione è ancora valida
-     * Controlla se sono passati più di 30 minuti dal login
-     * @return true se la sessione è valida, false se è scaduta
+     * @return true se l'utente è loggato
      */
     public boolean isSessionValid() {
-        if (!this.isLogged || this.loginTime == null) {
-            return false;
-        }
-
-        try {
-            Time now = Time.now();
-            int minutiTrascorsi = this.loginTime.differenceMinutes(now);
-            if (minutiTrascorsi >= SESSION_TIMEOUT_MINUTES) {
-                System.out.println("Sessione scaduta per " + this.username + ". Effettuare il login nuovamente.");
-                this.logout();
-                return false;
-            }
-            return true;
-        } catch (TimeFormatException e) {
-            System.out.println("Errore durante la verifica della sessione: " + e.getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Restituisce il tempo rimasto di sessione in minuti
-     * @return i minuti rimasti prima della scadenza della sessione
-     */
-    public int getTimeRemaining() {
-        if (!this.isLogged || this.loginTime == null) {
-            return 0;
-        }
-
-        try {
-            Time now = Time.now();
-            int minutiTrascorsi = this.loginTime.differenceMinutes(now);
-            int minutiRimasti = SESSION_TIMEOUT_MINUTES - minutiTrascorsi;
-            return Math.max(minutiRimasti, 0);
-        } catch (TimeFormatException e) {
-            System.out.println("Errore durante il calcolo del tempo rimanente: " + e.getMessage());
-            return 0;
-        }
+        return this.isLogged;
     }
 
 
@@ -279,18 +231,8 @@ public abstract class Utente {
 
     public void setLogged(boolean logged) {
         this.isLogged = logged;
-        if (!logged) {
-            this.loginTime = null;
-        }
     }
 
-    public Time getLoginTime() {
-        return loginTime;
-    }
-
-    public void setLoginTime(Time loginTime) {
-        this.loginTime = loginTime;
-    }
 
     @Override
     public String toString() {

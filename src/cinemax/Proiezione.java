@@ -108,7 +108,7 @@ public class Proiezione {
 
     @Override
     public String toString() {
-        return film.toString() + "\nProiezione: " + dataProiezione + " " + oraProiezione + "\nPrezzo: €" + prezzo;
+        return film.toString() + "\nProiezione: " + dataProiezione + " " + oraProiezione + "\nPrezzo: EUR " + prezzo;
     }
 
     @Override

@@ -10,6 +10,12 @@ public class Prenotazione {
     private LinkedList<Posto> seats;
     private double spesa;
 
+    public static void ensureIdCounterAtLeast(int id) {
+        if (id > idCounter) {
+            idCounter = id;
+        }
+    }
+
     public Prenotazione(Proiezione proiezione, LinkedList<Posto> seats, double spesa) {
         this.id = ++idCounter;
         this.proiezione = proiezione;
@@ -45,6 +51,10 @@ public class Prenotazione {
 
     public double getSpesa() {
         return spesa;
+    }
+
+    public void setProiezione(Proiezione proiezione) {
+        this.proiezione = proiezione;
     }
 
     public void setSeats(LinkedList<Posto> seats) {

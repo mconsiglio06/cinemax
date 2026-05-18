@@ -27,6 +27,14 @@ public class Cliente extends Utente {
             System.out.println("Posti insufficienti disponibili per questa proiezione.");
             return false;
         }
+        if (hasInvalidSeats(proiezione, seats)) {
+            System.out.println("Alcuni dei posti selezionati non esistono.");
+            return false;
+        }
+        if (hasOccupiedSeats(proiezione, seats)) {
+            System.out.println("Alcuni posti selezionati sono occupati.");
+            return false;
+        }
         if (!proiezione.reserveSeats(seats)) {
             System.out.println("Alcuni posti selezionati non sono disponibili.");
             return false;
@@ -58,6 +66,14 @@ public class Cliente extends Utente {
 
         Proiezione proiezione = prenotazione.getProiezione();
         LinkedList<Posto> postiPrecedenti = prenotazione.getSeats();
+        if (hasInvalidSeats(proiezione, nuoviPosti)) {
+            System.out.println("Alcuni dei posti selezionati non esistono.");
+            return false;
+        }
+        if (hasOccupiedSeats(proiezione, nuoviPosti)) {
+            System.out.println("Alcuni posti selezionati sono occupati.");
+            return false;
+        }
         proiezione.releaseSeats(postiPrecedenti);
         boolean canReserve = proiezione.reserveSeats(nuoviPosti);
         if (!canReserve) {
@@ -72,6 +88,91 @@ public class Cliente extends Utente {
             manager.updatePrenotazione(this, prenotazione);
         }
         System.out.println("Prenotazione modificata con successo: " + prenotazione.getId());
+        return true;
+    }
+
+    public boolean areSeatsOccupied(Proiezione proiezione, LinkedList<Posto> seats) {
+        return hasOccupiedSeats(proiezione, seats);
+    }
+
+    public boolean areSeatsInvalid(Proiezione proiezione, LinkedList<Posto> seats) {
+        return hasInvalidSeats(proiezione, seats);
+    }
+
+    private boolean hasInvalidSeats(Proiezione proiezione, LinkedList<Posto> seats) {
+        if (proiezione == null || seats == null) {
+            return true;
+        }
+        boolean[][] sala = proiezione.getSala();
+        for (Posto seat : seats) {
+            int row = seat.getRowIndex();
+            int col = seat.getNumero();
+            if (row < 1 || row > sala.length || col < 1 || col > sala[0].length) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasOccupiedSeats(Proiezione proiezione, LinkedList<Posto> seats) {
+        if (manager == null || proiezione == null || seats == null) {
+            return false;
+        }
+        boolean[][] occupancy = manager.getOccupancyMap(proiezione);
+        for (Posto seat : seats) {
+            int row = seat.getRowIndex();
+            int col = seat.getNumero();
+            if (occupancy[row - 1][col - 1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean changeProiezione(Prenotazione prenotazione, Proiezione nuovaProiezione) {
+        if (prenotazione == null || !bookings.contains(prenotazione)) {
+            System.out.println("Prenotazione non trovata.");
+            return false;
+        }
+        if (nuovaProiezione == null) {
+            System.out.println("Nuova proiezione non valida.");
+            return false;
+        }
+        if (!isFutureProiezione(nuovaProiezione)) {
+            System.out.println("La nuova proiezione deve essere futura.");
+            return false;
+        }
+        if (!nuovaProiezione.getFilm().getTitolo().equalsIgnoreCase(prenotazione.getProiezione().getFilm().getTitolo())) {
+            System.out.println("La nuova proiezione deve essere dello stesso film.");
+            return false;
+        }
+        if (nuovaProiezione.equals(prenotazione.getProiezione())) {
+            System.out.println("La nuova proiezione è la stessa di quella attuale.");
+            return false;
+        }
+
+        Proiezione vecchiaProiezione = prenotazione.getProiezione();
+        LinkedList<Posto> posti = prenotazione.getSeats();
+
+        // Rilascia posti dalla vecchia proiezione
+        vecchiaProiezione.releaseSeats(posti);
+
+        // Prova a riservare nella nuova
+        boolean canReserve = nuovaProiezione.reserveSeats(posti);
+        if (!canReserve) {
+            // Se fallisce, rimetti nella vecchia
+            vecchiaProiezione.reserveSeats(posti);
+            System.out.println("I posti non sono disponibili nella nuova proiezione. Modifica annullata.");
+            return false;
+        }
+
+        // Aggiorna prenotazione
+        prenotazione.setProiezione(nuovaProiezione);
+        prenotazione.setSpesa(nuovaProiezione.getPrezzo() * posti.size());
+        if (manager != null) {
+            manager.updatePrenotazione(this, prenotazione);
+        }
+        System.out.println("Proiezione modificata con successo: " + prenotazione.getId());
         return true;
     }
 

@@ -113,11 +113,7 @@ public class Bigliettaio extends Utente {
         }
         try {
             Date oggi = Date.today();
-            double incasso = manager.getDailyRevenue(oggi);
-            System.out.println("=== Report incassi giornalieri ===");
-            System.out.println("Data: " + oggi);
-            System.out.println("Incasso totale: €" + incasso);
-            return incasso;
+            return manager.getDailyRevenue(oggi);
         } catch (DateFormatException e) {
             System.out.println("Errore nel recupero della data odierna: " + e.getMessage());
             return 0;
