@@ -1,3 +1,14 @@
+/**
+ * Progetto: CineMax - Laboratorio Interdisciplinare A
+ * Anno Accademico: 2025/2026
+ * Sede: Varese (VA)
+ * * Autori del progetto:
+ * - Matteo Consiglio (Matricola: 765479)
+ * - Giulia Alessandra Casagrande (Matricola: 765252)
+ * - Valeria Ferrigno (Matricola: 766909)
+ * - Edoardo Della Torre (Matricola: 766913)
+ */
+
 package cinemax;
 
 import java.io.*;
