@@ -1,10 +1,29 @@
 package cinemax;
 
+/**
+ * Rappresenta il ruolo amministrativo responsabile della gestione del palinsesto.
+ */
 public class Proiezionista extends Utente {
+    /**
+     * Crea un utente proiezionista.
+     *
+     * @param nome nome del proiezionista.
+     * @param cognome cognome del proiezionista.
+     * @param username username di accesso.
+     * @param password password di accesso.
+     * @param dataNascita data di nascita.
+     * @param luogo luogo associato all'utente.
+     */
     public Proiezionista(String nome, String cognome, String username, String password, Date dataNascita, String luogo) {
         super(nome, cognome, username, password, dataNascita, luogo, Ruolo.PROIEZIONISTA, true, true);
     }
 
+    /**
+     * Aggiunge una proiezione al palinsesto.
+     *
+     * @param proiezione proiezione da aggiungere.
+     * @return true se l'aggiunta e completata.
+     */
     public boolean aggiungiProiezione(Proiezione proiezione) {
         if (!isSessionValid()) {
             System.out.println("Devi essere loggato per aggiungere una proiezione.");
@@ -21,6 +40,12 @@ public class Proiezionista extends Utente {
         return risultato;
     }
 
+    /**
+     * Rimuove una proiezione, se non ha prenotazioni associate.
+     *
+     * @param proiezione proiezione da rimuovere.
+     * @return true se la rimozione e completata.
+     */
     public boolean rimuoviProiezione(Proiezione proiezione) {
         if (!isSessionValid()) {
             System.out.println("Devi essere loggato per rimuovere una proiezione.");
@@ -37,6 +62,13 @@ public class Proiezionista extends Utente {
         return risultato;
     }
 
+    /**
+     * Modifica una proiezione esistente.
+     *
+     * @param originale proiezione attuale.
+     * @param aggiornata nuova versione della proiezione.
+     * @return true se la modifica e completata.
+     */
     public boolean modificaProiezione(Proiezione originale, Proiezione aggiornata) {
         if (!isSessionValid()) {
             System.out.println("Devi essere loggato per modificare una proiezione.");
@@ -53,6 +85,11 @@ public class Proiezionista extends Utente {
         return risultato;
     }
 
+    /**
+     * Stampa statistiche di occupazione e incasso per una proiezione.
+     *
+     * @param proiezione proiezione da analizzare.
+     */
     public void visualizzaStatistiche(Proiezione proiezione) {
         if (!isSessionValid()) {
             System.out.println("Devi essere loggato per visualizzare le statistiche.");
@@ -94,6 +131,11 @@ public class Proiezionista extends Utente {
         }
     }
 
+    /**
+     * Cerca e stampa proiezioni in base al titolo.
+     *
+     * @param titolo titolo o porzione di titolo.
+     */
     public void cerca(String titolo) {
         if (manager == null) {
             System.out.println("Manager non inizializzato.");

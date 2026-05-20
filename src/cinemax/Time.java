@@ -2,15 +2,33 @@ package cinemax;
 
 import java.time.LocalTime;
 
+/**
+ * Rappresenta un orario espresso in ore e minuti.
+ * Include metodi di conversione in minuti e confronti temporali usati
+ * per verificare la validita e la sovrapposizione delle proiezioni.
+ */
 public class Time {
     private int ore;
     private int minuti;
 
+    /**
+     * Restituisce l'orario corrente del sistema.
+     *
+     * @return orario corrente.
+     * @throws TimeFormatException se l'orario corrente non potesse essere convertito.
+     */
     public static Time now() throws TimeFormatException {
         LocalTime localTime = LocalTime.now();
         return new Time(localTime.getHour(), localTime.getMinute());
     }
 
+    /**
+     * Crea un orario validando ore e minuti.
+     *
+     * @param ore ora nel formato 0-23.
+     * @param minuti minuti nel formato 0-59.
+     * @throws TimeFormatException se ore o minuti non sono validi.
+     */
     public Time(int ore, int minuti) throws TimeFormatException {
         if (verifyFormat(ore, minuti)) {
             this.ore = ore;
@@ -24,18 +42,39 @@ public class Time {
         return (ore >= 0 && ore < 24) && (minuti >= 0 && minuti < 60);
     }
 
+    /**
+     * Restituisce le ore dell'orario.
+     *
+     * @return ore dell'orario.
+     */
     public int getOre() {
         return ore;
     }
 
+    /**
+     * Restituisce i minuti dell'orario.
+     *
+     * @return minuti dell'orario.
+     */
     public int getMinuti() {
         return minuti;
     }
 
+    /**
+     * Converte l'orario nel numero di minuti trascorsi da mezzanotte.
+     *
+     * @return minuti totali da mezzanotte.
+     */
     public int toMinutes() {
         return ore * 60 + minuti;
     }
 
+    /**
+     * Calcola la distanza in minuti da questo orario a un altro orario.
+     *
+     * @param altra orario di arrivo.
+     * @return differenza in minuti, gestendo anche il cambio giorno.
+     */
     public int differenceMinutes(Time altra) {
         int thisMinutes = this.toMinutes();
         int altraMinutes = altra.toMinutes();
@@ -46,10 +85,22 @@ public class Time {
         return diff;
     }
 
+    /**
+     * Indica se questo orario e successivo a un altro.
+     *
+     * @param altra orario da confrontare.
+     * @return true se questo orario viene dopo {@code altra}.
+     */
     public boolean isAfter(Time altra) {
         return this.differenceMinutes(altra) > 0 && this.differenceMinutes(altra) < 24 * 60;
     }
 
+    /**
+     * Indica se questo orario e precedente a un altro.
+     *
+     * @param altra orario da confrontare.
+     * @return true se questo orario viene prima di {@code altra}.
+     */
     public boolean isBefore(Time altra) {
         return altra.differenceMinutes(this) > 0 && altra.differenceMinutes(this) < 24 * 60;
     }

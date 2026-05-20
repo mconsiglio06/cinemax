@@ -4,6 +4,11 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.LinkedList;
 
+/**
+ * Classe di servizio centrale dell'applicazione CineMax.
+ * Gestisce autenticazione, persistenza su file CSV, proiezioni, prenotazioni,
+ * mappe di occupazione e calcolo degli incassi.
+ */
 public class Manager {
     // Questa classe gestirà la registrazione, il login e la gestione degli utenti
     // Per ora è solo una struttura vuota, ma in futuro potrà essere implementata con funzionalità reali
@@ -14,6 +19,9 @@ public class Manager {
 
     LinkedList<Proiezione> proiezioni = new LinkedList<>();
 
+    /**
+     * Inizializza il manager e allinea il contatore degli ID prenotazione.
+     */
     public Manager() {
         initializePrenotazioneIdCounter();
     }
@@ -40,6 +48,11 @@ public class Manager {
     /**
      * Salva un utente nel file utenti.csv con la password cifrata
      * @param utente l'utente da salvare
+     */
+    /**
+     * Salva un utente nel file CSV degli utenti.
+     *
+     * @param utente utente da salvare.
      */
     public void saveUtente(Utente utente) {
         try {
@@ -80,6 +93,12 @@ public class Manager {
      * @param username l'username da verificare
      * @return true se esiste, false altrimenti
      */
+    /**
+     * Verifica se uno username e gia presente nel file utenti.
+     *
+     * @param username username da controllare.
+     * @return true se lo username esiste.
+     */
     public boolean usernameExists(String username) {
         try (BufferedReader reader = new BufferedReader(new FileReader(UTENTI_FILE))) {
             String line = reader.readLine();
@@ -107,6 +126,13 @@ public class Manager {
         return false;
     }
 
+    /**
+     * Autentica un utente confrontando username e password cifrata.
+     *
+     * @param username username inserito.
+     * @param password password in chiaro inserita.
+     * @return utente autenticato, oppure null.
+     */
     public Utente authenticate(String username, String password) {
         if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
             return null;
@@ -173,6 +199,12 @@ public class Manager {
         }
     }
 
+    /**
+     * Salva una prenotazione nel file CSV.
+     *
+     * @param cliente cliente proprietario della prenotazione.
+     * @param prenotazione prenotazione da salvare.
+     */
     public void savePrenotazione(Cliente cliente, Prenotazione prenotazione) {
         try {
             ensurePrenotazioniHeader();
@@ -199,6 +231,45 @@ public class Manager {
         }
     }
 
+    /**
+     * Calcola il primo ID prenotazione disponibile.
+     *
+     * @return ID libero piu basso.
+     */
+    public int getNextPrenotazioneId() {
+        boolean[] used = new boolean[10000];
+        File file = new File(PRENOTAZIONI_FILE);
+        if (!file.exists()) {
+            return 1;
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line = reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+                int id = parsePrenotazioneId(line);
+                if (id > 0 && id < used.length) {
+                    used[id] = true;
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Errore durante il calcolo del prossimo ID prenotazione: " + e.getMessage());
+        }
+        for (int id = 1; id < used.length; id++) {
+            if (!used[id]) {
+                return id;
+            }
+        }
+        return used.length;
+    }
+
+    /**
+     * Restituisce le prenotazioni associate a uno username.
+     *
+     * @param username username del cliente.
+     * @return lista delle prenotazioni trovate.
+     */
     public LinkedList<Prenotazione> getPrenotazioniByUser(String username) {
         LinkedList<Prenotazione> elenco = new LinkedList<>();
         try {
@@ -228,6 +299,12 @@ public class Manager {
         return elenco;
     }
 
+    /**
+     * Restituisce le prenotazioni associate a una proiezione.
+     *
+     * @param proiezione proiezione da cercare.
+     * @return lista delle prenotazioni trovate.
+     */
     public LinkedList<Prenotazione> getPrenotazioniByProiezione(Proiezione proiezione) {
         LinkedList<Prenotazione> elenco = new LinkedList<>();
         if (proiezione == null) {
@@ -251,10 +328,22 @@ public class Manager {
         return elenco;
     }
 
+    /**
+     * Verifica se una proiezione ha prenotazioni associate.
+     *
+     * @param proiezione proiezione da controllare.
+     * @return true se esiste almeno una prenotazione.
+     */
     public boolean hasPrenotazioni(Proiezione proiezione) {
         return !getPrenotazioniByProiezione(proiezione).isEmpty();
     }
 
+    /**
+     * Restituisce le proiezioni programmate in una data.
+     *
+     * @param data data di filtro.
+     * @return lista delle proiezioni trovate.
+     */
     public LinkedList<Proiezione> getProiezioniByDate(Date data) {
         LinkedList<Proiezione> elenco = new LinkedList<>();
         if (data == null) {
@@ -268,6 +357,12 @@ public class Manager {
         return elenco;
     }
 
+    /**
+     * Restituisce le prenotazioni relative a una data.
+     *
+     * @param data data di filtro.
+     * @return lista delle prenotazioni trovate.
+     */
     public LinkedList<Prenotazione> getPrenotazioniByDate(Date data) {
         LinkedList<Prenotazione> elenco = new LinkedList<>();
         if (data == null) {
@@ -291,6 +386,11 @@ public class Manager {
         return elenco;
     }
 
+    /**
+     * Restituisce tutte le prenotazioni presenti nel CSV.
+     *
+     * @return lista completa delle prenotazioni valide.
+     */
     public LinkedList<Prenotazione> getPrenotazioni() {
         LinkedList<Prenotazione> elenco = new LinkedList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(PRENOTAZIONI_FILE))) {
@@ -311,6 +411,12 @@ public class Manager {
         return elenco;
     }
 
+    /**
+     * Cerca una prenotazione per ID.
+     *
+     * @param id identificativo della prenotazione.
+     * @return prenotazione trovata, oppure null.
+     */
     public Prenotazione getPrenotazioneById(int id) {
         try (BufferedReader reader = new BufferedReader(new FileReader(PRENOTAZIONI_FILE))) {
             reader.readLine();
@@ -330,6 +436,12 @@ public class Manager {
         return null;
     }
 
+    /**
+     * Cerca prenotazioni per nome, cognome o username cliente.
+     *
+     * @param cliente testo di ricerca.
+     * @return lista delle prenotazioni compatibili.
+     */
     public LinkedList<Prenotazione> searchPrenotazioniByCliente(String cliente) {
         LinkedList<Prenotazione> elenco = new LinkedList<>();
         if (cliente == null || cliente.isEmpty()) {
@@ -362,6 +474,12 @@ public class Manager {
         return elenco;
     }
 
+    /**
+     * Calcola l'incasso di una giornata.
+     *
+     * @param data data richiesta.
+     * @return totale incassato.
+     */
     public double getDailyRevenue(Date data) {
         double totale = 0;
         for (Prenotazione prenotazione : getPrenotazioniByDate(data)) {
@@ -370,6 +488,12 @@ public class Manager {
         return totale;
     }
 
+    /**
+     * Calcola l'incasso della settimana contenente la data indicata.
+     *
+     * @param data data di riferimento.
+     * @return totale settimanale.
+     */
     public double getWeeklyRevenue(Date data) {
         if (data == null) {
             return 0;
@@ -387,6 +511,12 @@ public class Manager {
         return totale;
     }
 
+    /**
+     * Calcola l'incasso del mese contenente la data indicata.
+     *
+     * @param data data di riferimento.
+     * @return totale mensile.
+     */
     public double getMonthlyRevenue(Date data) {
         if (data == null) {
             return 0;
@@ -401,6 +531,12 @@ public class Manager {
         return totale;
     }
 
+    /**
+     * Calcola l'incasso dell'anno contenente la data indicata.
+     *
+     * @param data data di riferimento.
+     * @return totale annuo.
+     */
     public double getYearlyRevenue(Date data) {
         if (data == null) {
             return 0;
@@ -418,6 +554,12 @@ public class Manager {
         return LocalDate.of(data.getAnno(), data.getMese(), data.getGiorno());
     }
 
+    /**
+     * Costruisce la mappa di occupazione reale leggendo le prenotazioni salvate.
+     *
+     * @param proiezione proiezione da analizzare.
+     * @return matrice true/false dei posti occupati.
+     */
     public boolean[][] getOccupancyMap(Proiezione proiezione) {
         boolean[][] map = new boolean[10][20];
         if (proiezione == null) {
@@ -435,6 +577,12 @@ public class Manager {
         return map;
     }
 
+    /**
+     * Aggiunge una proiezione al file CSV controllando le sovrapposizioni.
+     *
+     * @param proiezione proiezione da aggiungere.
+     * @return true se l'inserimento riesce.
+     */
     public boolean addProiezione(Proiezione proiezione) {
         if (proiezione == null) {
             System.out.println("Proiezione non valida.");
@@ -458,6 +606,13 @@ public class Manager {
         }
     }
 
+    /**
+     * Aggiorna una proiezione esistente nel CSV.
+     *
+     * @param originale proiezione da sostituire.
+     * @param aggiornato nuova proiezione.
+     * @return true se la modifica riesce.
+     */
     public boolean updateProiezione(Proiezione originale, Proiezione aggiornato) {
         if (originale == null || aggiornato == null) {
             System.out.println("Proiezione non valida.");
@@ -504,6 +659,12 @@ public class Manager {
         return true;
     }
 
+    /**
+     * Rimuove una proiezione dal CSV se possibile.
+     *
+     * @param proiezione proiezione da rimuovere.
+     * @return true se la rimozione riesce.
+     */
     public boolean removeProiezione(Proiezione proiezione) {
         if (proiezione == null) {
             System.out.println("Proiezione non valida.");
@@ -545,6 +706,12 @@ public class Manager {
         return true;
     }
 
+    /**
+     * Verifica se una nuova proiezione si sovrappone a quelle gia esistenti.
+     *
+     * @param nuovaProiezione proiezione da verificare.
+     * @return true se esiste una sovrapposizione.
+     */
     public boolean isOverlapping(Proiezione nuovaProiezione) {
         return isOverlappingInternal(nuovaProiezione);
     }
@@ -688,6 +855,12 @@ public class Manager {
         return sb.toString();
     }
 
+    /**
+     * Rimuove una prenotazione dal CSV.
+     *
+     * @param cliente cliente proprietario, se disponibile.
+     * @param prenotazione prenotazione da rimuovere.
+     */
     public void removePrenotazione(Cliente cliente, Prenotazione prenotazione) {
         File file = new File(PRENOTAZIONI_FILE);
         File tempFile = new File(PRENOTAZIONI_FILE + ".tmp");
@@ -721,6 +894,12 @@ public class Manager {
         }
     }
 
+    /**
+     * Aggiorna una prenotazione nel CSV.
+     *
+     * @param cliente cliente proprietario.
+     * @param prenotazione prenotazione aggiornata.
+     */
     public void updatePrenotazione(Cliente cliente, Prenotazione prenotazione) {
         File file = new File(PRENOTAZIONI_FILE);
         File tempFile = new File(PRENOTAZIONI_FILE + ".tmp");
@@ -801,6 +980,14 @@ public class Manager {
         return value;
     }
 
+    /**
+     * Cerca una proiezione per titolo, data e ora.
+     *
+     * @param titolo titolo del film.
+     * @param data data della proiezione.
+     * @param ora ora della proiezione.
+     * @return proiezione trovata, oppure null.
+     */
     public Proiezione findProiezione(String titolo, Date data, Time ora) {
         LinkedList<Proiezione> elenco = getProiezioni();
         for (Proiezione p : elenco) {
@@ -813,6 +1000,12 @@ public class Manager {
         return null;
     }
 
+    /**
+     * Metodo segnaposto mantenuto per compatibilita con versioni precedenti.
+     *
+     * @param utente utente di riferimento.
+     * @return lista vuota.
+     */
     public LinkedList<Prenotazione> proiezioniByGenre(Utente utente) {
         // Implementazione per ottenere le prenotazioni di un utente
         return new LinkedList<>();
@@ -821,6 +1014,11 @@ public class Manager {
     /**
      * Legge il file proiezioni.csv e restituisce la lista completa delle proiezioni.
      * Ogni riga viene convertita in un oggetto Proiezione contenente tutte le informazioni.
+     */
+    /**
+     * Legge tutte le proiezioni presenti nel file CSV.
+     *
+     * @return lista completa delle proiezioni valide.
      */
     public LinkedList<Proiezione> getProiezioni() {
         proiezioni.clear();

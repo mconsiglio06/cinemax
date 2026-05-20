@@ -8,6 +8,12 @@ public class SecurityUtils {
     private static final int SHIFT = 3;  // Shift del cifrario di Cesare
 
     /**
+     * Costruttore privato per impedire l'istanza della classe utility.
+     */
+    private SecurityUtils() {
+    }
+
+    /**
      * Cifra una password usando il cifrario di Cesare
      * @param password la password da cifrare
      * @return la password cifrata

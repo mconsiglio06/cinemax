@@ -1,9 +1,17 @@
 package cinemax;
 
+/**
+ * Elenco dei ruoli supportati dall'applicazione.
+ * Ogni ruolo specifica se possiede privilegi amministrativi.
+ */
 public enum Ruolo {
+    /** Utente generico non autenticato. */
     UTENTE(false, false),
-    CLIENTE(false, true), 
-    PROIEZIONISTA(true, true), 
+    /** Cliente registrato. */
+    CLIENTE(false, true),
+    /** Addetto alla gestione del palinsesto. */
+    PROIEZIONISTA(true, true),
+    /** Addetto alla biglietteria. */
     BIGLIETTAIO(true, true);
 
     private final boolean power;
@@ -16,11 +24,21 @@ public enum Ruolo {
     }
 
     // Metodo per verificare se è un utente con privilegi
+    /**
+     * Indica se il ruolo dispone di poteri amministrativi.
+     *
+     * @return true per ruoli del personale con privilegi.
+     */
     public boolean hasPowers() {
         return power;
     }
 
     // Metodo per verificare se è un utente loggato
+    /**
+     * Restituisce lo stato di login associato al ruolo.
+     *
+     * @return true se il ruolo e marcato come loggato.
+     */
     public boolean isLogged() {
         return logged;
     }

@@ -2,12 +2,27 @@ import cinemax.*;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+/**
+ * Entry point e interfaccia testuale dell'applicazione CineMax.
+ * Coordina login, registrazione, menu per ruoli e chiamate alle classi di dominio.
+ */
 public class MainCinemax {
     private static final Scanner sc = new Scanner(System.in);
     private static final Manager manager = new Manager();
     private static Utente currentUser;
     private static int tentativiLoginFalliti = 0;
 
+    /**
+     * Costruttore privato: la classe espone solo metodi statici di avvio e menu.
+     */
+    private MainCinemax() {
+    }
+
+    /**
+     * Avvia l'applicazione da console.
+     *
+     * @param args argomenti da riga di comando non utilizzati.
+     */
     public static void main(String[] args) {
         Utente.setManager(manager);
         System.out.println("---- CineMax - All'avanguardia del cinema ----");
@@ -190,10 +205,10 @@ public class MainCinemax {
 
     private static String getCodiceAccesso(Ruolo ruolo) {
         if (ruolo == Ruolo.PROIEZIONISTA) {
-            return "admin1";
+            return "CMXPRO2026";
         }
         if (ruolo == Ruolo.BIGLIETTAIO) {
-            return "admin2";
+            return "CMXBIG2026";
         }
         return null;
     }
@@ -1164,6 +1179,102 @@ public class MainCinemax {
         }
     }
 
+    private static void venditaDirettaBigliettaio(Bigliettaio bigliettaio) {
+        System.out.println("--- Vendita diretta al bancone ---");
+        Proiezione proiezione = selezionaProiezioneConFiltri();
+        if (proiezione == null) {
+            return;
+        }
+        System.out.println("Mappa sala (X = occupato):");
+        System.out.println(renderSalaWithUserSeats(proiezione, null));
+        while (true) {
+            LinkedList<Posto> postiScelti = inputSeats();
+            if (postiScelti.isEmpty()) {
+                System.out.println("Vendita annullata.");
+                return;
+            }
+            if (bigliettaio.venditaDiretta(proiezione, postiScelti)) {
+                return;
+            }
+        }
+    }
+
+    private static void visualizzaProiezioniGiornaliereBigliettaio() {
+        try {
+            LinkedList<Proiezione> proiezioni = manager.getProiezioniByDate(Date.today());
+            if (proiezioni.isEmpty()) {
+                System.out.println("Nessuna proiezione programmata per oggi.");
+                return;
+            }
+            System.out.println("=== Proiezioni di oggi ===");
+            for (int i = 0; i < proiezioni.size(); i++) {
+                System.out.println((i + 1) + " - " + proiezioni.get(i));
+                System.out.println("-------------------------");
+            }
+            selezionaProiezionePerDettagli(proiezioni, null, true);
+        } catch (DateFormatException e) {
+            System.out.println("Errore nel recupero della data odierna: " + e.getMessage());
+        }
+    }
+
+    private static void gestisciPrenotazioniBigliettaio(Bigliettaio bigliettaio, LinkedList<Prenotazione> prenotazioni, String titolo) {
+        if (prenotazioni == null || prenotazioni.isEmpty()) {
+            System.out.println("Nessuna prenotazione trovata.");
+            return;
+        }
+        System.out.println("=== " + titolo + " ===");
+        for (int i = 0; i < prenotazioni.size(); i++) {
+            Prenotazione p = prenotazioni.get(i);
+            Proiezione proiezione = p.getProiezione();
+            System.out.println((i + 1) + " - ID: " + p.getId()
+                    + " | " + proiezione.getFilm().getTitolo()
+                    + " | Data: " + proiezione.getDataProiezione()
+                    + " | Ora: " + proiezione.getOraProiezione()
+                    + " | Posti: " + p.getSeats()
+                    + " | Totale: EUR " + String.format("%.2f", p.getSpesa()));
+        }
+        System.out.print("Seleziona prenotazione da gestire (0 per tornare): ");
+        int scelta = readInt();
+        if (scelta <= 0 || scelta > prenotazioni.size()) {
+            return;
+        }
+        Prenotazione selezionata = prenotazioni.get(scelta - 1);
+        mostraDettagliPrenotazione(selezionata);
+        System.out.println("\nOpzioni:");
+        System.out.println("1 - Annulla prenotazione");
+        System.out.println("0 - Torna indietro");
+        System.out.print("Scelta: ");
+        int azione = readInt();
+        if (azione == 1) {
+            bigliettaio.annulla(selezionata.getId());
+        }
+    }
+
+    private static void cercaPrenotazioniOggiBigliettaio(Bigliettaio bigliettaio) {
+        try {
+            gestisciPrenotazioniBigliettaio(bigliettaio, manager.getPrenotazioniByDate(Date.today()), "Prenotazioni di oggi");
+        } catch (DateFormatException e) {
+            System.out.println("Errore nel recupero della data odierna: " + e.getMessage());
+        }
+    }
+
+    private static void cercaPrenotazioneIdBigliettaio(Bigliettaio bigliettaio) {
+        System.out.print("ID prenotazione: ");
+        int id = readInt();
+        LinkedList<Prenotazione> prenotazioni = new LinkedList<>();
+        Prenotazione prenotazione = manager.getPrenotazioneById(id);
+        if (prenotazione != null) {
+            prenotazioni.add(prenotazione);
+        }
+        gestisciPrenotazioniBigliettaio(bigliettaio, prenotazioni, "Prenotazione ID: " + id);
+    }
+
+    private static void cercaPrenotazioniClienteBigliettaio(Bigliettaio bigliettaio) {
+        System.out.print("Nome, cognome o username cliente: ");
+        String query = sc.nextLine().trim();
+        gestisciPrenotazioniBigliettaio(bigliettaio, manager.searchPrenotazioniByCliente(query), "Prenotazioni per cliente: " + query);
+    }
+
     private static void bigliettaioMenu(Bigliettaio bigliettaio) {
         while (bigliettaio.isSessionValid()) {
             System.out.println("\n--- Menu Bigliettaio ---");
@@ -1173,25 +1284,23 @@ public class MainCinemax {
             System.out.println("4 - Cerca prenotazioni per cliente");
             System.out.println("5 - Report incassi");
             System.out.println("6 - Cerca e visualizza proiezioni nel dettaglio");
+            System.out.println("7 - Annulla prenotazione");
+            System.out.println("8 - Vendita diretta al bancone");
             System.out.println("0 - Logout");
             System.out.print("Scelta: ");
             int scelta = readInt();
             switch (scelta) {
                 case 1:
-                    bigliettaio.vediProiezioniGiornaliere();
+                    visualizzaProiezioniGiornaliereBigliettaio();
                     break;
                 case 2:
-                    bigliettaio.searchPrenotazioni();
+                    cercaPrenotazioniOggiBigliettaio(bigliettaio);
                     break;
                 case 3:
-                    System.out.print("ID prenotazione: ");
-                    int id = readInt();
-                    bigliettaio.searchPrenotazioni(id);
+                    cercaPrenotazioneIdBigliettaio(bigliettaio);
                     break;
                 case 4:
-                    System.out.print("Nome, cognome o username cliente: ");
-                    String query = sc.nextLine().trim();
-                    bigliettaio.searchPrenotazioni(query);
+                    cercaPrenotazioniClienteBigliettaio(bigliettaio);
                     break;
                 case 5:
                     mostraReportIncassi();
@@ -1201,6 +1310,14 @@ public class MainCinemax {
                     if (proiezioneDettaglio != null) {
                         mostraDettagliProiezione(proiezioneDettaglio, null, true);
                     }
+                    break;
+                case 7:
+                    System.out.print("ID prenotazione da annullare: ");
+                    int idAnnullamento = readInt();
+                    bigliettaio.annulla(idAnnullamento);
+                    break;
+                case 8:
+                    venditaDirettaBigliettaio(bigliettaio);
                     break;
                 case 0:
                     bigliettaio.logout();

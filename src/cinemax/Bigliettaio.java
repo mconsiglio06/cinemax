@@ -8,10 +8,23 @@ import java.util.LinkedList;
  */
 
 public class Bigliettaio extends Utente {
+    /**
+     * Crea un utente bigliettaio.
+     *
+     * @param nome nome del bigliettaio.
+     * @param cognome cognome del bigliettaio.
+     * @param username username di accesso.
+     * @param password password di accesso.
+     * @param dataNascita data di nascita.
+     * @param luogo luogo associato all'utente.
+     */
     public Bigliettaio(String nome, String cognome, String username, String password, Date dataNascita, String luogo) {
         super(nome, cognome, username, password, dataNascita, luogo, Ruolo.BIGLIETTAIO, true, true);
     }
 
+    /**
+     * Stampa le proiezioni programmate nella data odierna.
+     */
     public void vediProiezioniGiornaliere() {
         if (!isSessionValid()) {
             System.out.println("Devi essere loggato per visualizzare le proiezioni giornaliere.");
@@ -38,6 +51,9 @@ public class Bigliettaio extends Utente {
         }
     }
 
+    /**
+     * Stampa le prenotazioni della data odierna.
+     */
     public void searchPrenotazioni() {
         if (!isSessionValid()) {
             System.out.println("Devi essere loggato per cercare prenotazioni.");
@@ -63,6 +79,11 @@ public class Bigliettaio extends Utente {
         }
     }
 
+    /**
+     * Cerca prenotazioni per nome, cognome o username del cliente.
+     *
+     * @param cliente stringa di ricerca.
+     */
     public void searchPrenotazioni(String cliente) {
         if (!isSessionValid()) {
             System.out.println("Devi essere loggato per cercare prenotazioni.");
@@ -84,6 +105,11 @@ public class Bigliettaio extends Utente {
         }
     }
 
+    /**
+     * Cerca e stampa una prenotazione per ID.
+     *
+     * @param id identificativo della prenotazione.
+     */
     public void searchPrenotazioni(int id) {
         if (!isSessionValid()) {
             System.out.println("Devi essere loggato per cercare prenotazioni.");
@@ -102,6 +128,11 @@ public class Bigliettaio extends Utente {
         System.out.println(prenotazione);
     }
 
+    /**
+     * Calcola l'incasso giornaliero.
+     *
+     * @return totale incassato nella data odierna.
+     */
     public double report() {
         if (!isSessionValid()) {
             System.out.println("Devi essere loggato per visualizzare il report giornaliero.");
@@ -120,10 +151,109 @@ public class Bigliettaio extends Utente {
         }
     }
 
-    public void annulla() {
-        System.out.println("Funzione annulla non implementata per il bigliettaio.");
+    /**
+     * Annulla una prenotazione esistente e aggiorna la persistenza.
+     *
+     * @param idPrenotazione ID della prenotazione da annullare.
+     * @return true se l'annullamento e completato.
+     */
+    public boolean annulla(int idPrenotazione) {
+        if (!isSessionValid()) {
+            System.out.println("Devi essere loggato per annullare una prenotazione.");
+            return false;
+        }
+        if (manager == null) {
+            System.out.println("Manager non inizializzato.");
+            return false;
+        }
+        Prenotazione prenotazione = manager.getPrenotazioneById(idPrenotazione);
+        if (prenotazione == null) {
+            System.out.println("Nessuna prenotazione trovata con ID: " + idPrenotazione);
+            return false;
+        }
+        if (prenotazione.getProiezione() != null) {
+            prenotazione.getProiezione().releaseSeats(prenotazione.getSeats());
+        }
+        manager.removePrenotazione(null, prenotazione);
+        System.out.println("Prenotazione annullata: " + idPrenotazione);
+        return true;
     }
 
+    /**
+     * Registra una vendita al banco associandola all'utente fittizio CASSA.
+     *
+     * @param proiezione proiezione acquistata.
+     * @param postiScelti posti venduti.
+     * @return true se la vendita viene registrata.
+     */
+    public boolean venditaDiretta(Proiezione proiezione, LinkedList<Posto> postiScelti) {
+        if (!isSessionValid()) {
+            System.out.println("Devi essere loggato per effettuare una vendita diretta.");
+            return false;
+        }
+        if (manager == null) {
+            System.out.println("Manager non inizializzato.");
+            return false;
+        }
+        if (proiezione == null || postiScelti == null || postiScelti.isEmpty()) {
+            System.out.println("Seleziona almeno un posto valido.");
+            return false;
+        }
+        if (hasInvalidSeats(proiezione, postiScelti)) {
+            System.out.println("Alcuni dei posti selezionati non esistono.");
+            return false;
+        }
+        if (hasOccupiedSeats(proiezione, postiScelti)) {
+            System.out.println("Alcuni posti selezionati sono occupati.");
+            return false;
+        }
+        if (!proiezione.reserveSeats(postiScelti)) {
+            System.out.println("Alcuni posti selezionati non sono disponibili.");
+            return false;
+        }
+        double spesa = proiezione.getPrezzo() * postiScelti.size();
+        Prenotazione prenotazione = new Prenotazione(manager.getNextPrenotazioneId(), proiezione, postiScelti, spesa);
+        try {
+            Cliente cassa = new Cliente("CASSA", "CASSA", "CASSA", "CASSA", new Date(1, 1, 1900), "CASSA");
+            manager.savePrenotazione(cassa, prenotazione);
+        } catch (DateFormatException e) {
+            System.out.println("Errore nella creazione dell'utente fittizio CASSA: " + e.getMessage());
+            proiezione.releaseSeats(postiScelti);
+            return false;
+        }
+        System.out.println("Vendita diretta completata. ID prenotazione: " + prenotazione.getId() + " | Totale: EUR " + String.format("%.2f", spesa));
+        return true;
+    }
+
+    private boolean hasInvalidSeats(Proiezione proiezione, LinkedList<Posto> seats) {
+        boolean[][] sala = proiezione.getSala();
+        for (Posto seat : seats) {
+            int row = seat.getRowIndex();
+            int col = seat.getNumero();
+            if (row < 1 || row > sala.length || col < 1 || col > sala[0].length) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasOccupiedSeats(Proiezione proiezione, LinkedList<Posto> seats) {
+        boolean[][] occupancy = manager.getOccupancyMap(proiezione);
+        for (Posto seat : seats) {
+            int row = seat.getRowIndex();
+            int col = seat.getNumero();
+            if (occupancy[row - 1][col - 1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Stampa la mappa dei posti occupati per una proiezione.
+     *
+     * @param proiezione proiezione da visualizzare.
+     */
     public void mappa(Proiezione proiezione) {
         if (!isSessionValid()) {
             System.out.println("Devi essere loggato per visualizzare la mappa.");
@@ -150,6 +280,11 @@ public class Bigliettaio extends Utente {
         }
     }
 
+    /**
+     * Cerca e stampa proiezioni in base al titolo.
+     *
+     * @param titolo titolo o porzione di titolo.
+     */
     public void cerca(String titolo) {
         if (manager == null) {
             System.out.println("Manager non inizializzato.");

@@ -1,22 +1,48 @@
 package cinemax;
 
+/**
+ * Rappresenta un posto in sala identificato da fila e numero.
+ * La fila puo essere espressa come lettera; il metodo {@link #getRowIndex()}
+ * converte la fila in indice numerico per accedere alla matrice dei posti.
+ */
 public class Posto {
     private final String fila;
     private final int numero;
 
+    /**
+     * Crea un posto normalizzando la fila in maiuscolo.
+     *
+     * @param fila fila del posto.
+     * @param numero numero del posto nella fila.
+     */
     public Posto(String fila, int numero) {
         this.fila = fila.toUpperCase();
         this.numero = numero;
     }
 
+    /**
+     * Restituisce la fila del posto.
+     *
+     * @return fila del posto.
+     */
     public String getFila() {
         return fila;
     }
 
+    /**
+     * Restituisce il numero del posto.
+     *
+     * @return numero del posto.
+     */
     public int getNumero() {
         return numero;
     }
 
+    /**
+     * Converte la fila in indice numerico a partire da 1.
+     *
+     * @return indice della fila, oppure -1 se la fila non e valida.
+     */
     public int getRowIndex() {
         if (fila == null || fila.isEmpty()) {
             return -1;

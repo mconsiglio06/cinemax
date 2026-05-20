@@ -2,16 +2,35 @@ package cinemax;
 
 import java.time.LocalDate;
 
+/**
+ * Rappresenta una data del calendario usando giorno, mese e anno.
+ * La classe fornisce validazione del formato e confronti cronologici
+ * utilizzati per proiezioni, utenti e prenotazioni.
+ */
 public class Date {
     private int giorno;
     private int mese;
     private int anno;
 
+    /**
+     * Restituisce la data corrente del sistema.
+     *
+     * @return data odierna.
+     * @throws DateFormatException se la data corrente non potesse essere convertita.
+     */
     public static Date today() throws DateFormatException {
         LocalDate localDate = LocalDate.now();
         return new Date(localDate.getDayOfMonth(), localDate.getMonthValue(), localDate.getYear());
     }
 
+    /**
+     * Crea una data validando giorno, mese e anno.
+     *
+     * @param g giorno del mese.
+     * @param m mese dell'anno.
+     * @param a anno.
+     * @throws DateFormatException se la combinazione giorno/mese/anno non e valida.
+     */
     public Date (int g, int m, int a) throws DateFormatException {
         boolean v = verifyFormat(g, m, a);
         if(v) {
@@ -34,6 +53,12 @@ public class Date {
         return g <= giorniPerMese[m - 1];
     }
 
+    /**
+     * Indica se questa data e successiva a un'altra data.
+     *
+     * @param altra data da confrontare.
+     * @return true se questa data e dopo {@code altra}.
+     */
     public boolean isAfter(Date altra) {
         if (this.anno > altra.anno)
             return true;
@@ -45,6 +70,12 @@ public class Date {
         return false;
     }
 
+    /**
+     * Indica se questa data e precedente a un'altra data.
+     *
+     * @param altra data da confrontare.
+     * @return true se questa data e prima di {@code altra}.
+     */
     public boolean isBefore(Date altra) {
         if (this.anno < altra.anno)
             return true;
@@ -66,26 +97,56 @@ public class Date {
         return this.giorno + "/" + this.mese + "/" + this.anno;
     }
     
+    /**
+     * Restituisce il giorno del mese.
+     *
+     * @return giorno del mese.
+     */
     public int getGiorno() {
         return giorno;
     }
 
+    /**
+     * Imposta il giorno del mese.
+     *
+     * @param giorno nuovo giorno del mese.
+     */
     public void setGiorno(int giorno) {
         this.giorno = giorno;
     }
 
+    /**
+     * Restituisce il mese dell'anno.
+     *
+     * @return mese dell'anno.
+     */
     public int getMese() {
         return mese;
     }
 
+    /**
+     * Imposta il mese dell'anno.
+     *
+     * @param mese nuovo mese dell'anno.
+     */
     public void setMese(int mese) {
         this.mese = mese;
     }
 
+    /**
+     * Restituisce l'anno della data.
+     *
+     * @return anno della data.
+     */
     public int getAnno() {
         return anno;
     }
 
+    /**
+     * Imposta l'anno della data.
+     *
+     * @param anno nuovo anno della data.
+     */
     public void setAnno(int anno) {
         this.anno = anno;
     }

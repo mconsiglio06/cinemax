@@ -2,14 +2,36 @@ package cinemax;
 
 import java.util.LinkedList;
 
+/**
+ * Rappresenta un utente cliente.
+ * Gestisce prenotazioni, modifiche, cancellazioni e ricerche delle proiezioni
+ * disponibili per l'acquisto.
+ */
 public class Cliente extends Utente {
     private LinkedList<Prenotazione> bookings;
 
+    /**
+     * Crea un cliente con i dati anagrafici e di accesso.
+     *
+     * @param nome nome del cliente.
+     * @param cognome cognome del cliente.
+     * @param username username di accesso.
+     * @param password password di accesso.
+     * @param dataNascita data di nascita.
+     * @param luogo luogo associato all'utente.
+     */
     public Cliente(String nome, String cognome, String username, String password, Date dataNascita, String luogo) {
         super(nome, cognome, username, password, dataNascita, luogo, Ruolo.CLIENTE, false, true);
         bookings = new LinkedList<>();
     }
 
+    /**
+     * Crea una nuova prenotazione per una proiezione futura.
+     *
+     * @param proiezione proiezione da prenotare.
+     * @param seats posti richiesti.
+     * @return true se la prenotazione viene completata e salvata.
+     */
     public boolean prenota(Proiezione proiezione, LinkedList<Posto> seats) {
         if (!isSessionValid()) {
             System.out.println("Devi essere loggato per prenotare.");
@@ -41,7 +63,9 @@ public class Cliente extends Utente {
         }
 
         double spesa = proiezione.getPrezzo() * seats.size();
-        Prenotazione prenotazione = new Prenotazione(proiezione, seats, spesa);
+        Prenotazione prenotazione = manager == null
+                ? new Prenotazione(proiezione, seats, spesa)
+                : new Prenotazione(manager.getNextPrenotazioneId(), proiezione, seats, spesa);
         bookings.add(prenotazione);
         if (manager != null) {
             manager.savePrenotazione(this, prenotazione);
@@ -50,6 +74,13 @@ public class Cliente extends Utente {
         return true;
     }
 
+    /**
+     * Modifica i posti associati a una prenotazione esistente.
+     *
+     * @param prenotazione prenotazione da modificare.
+     * @param nuoviPosti nuovi posti richiesti.
+     * @return true se la modifica viene salvata.
+     */
     public boolean edit(Prenotazione prenotazione, LinkedList<Posto> nuoviPosti) {
         if (prenotazione == null || !bookings.contains(prenotazione)) {
             System.out.println("Prenotazione non trovata.");
@@ -91,10 +122,24 @@ public class Cliente extends Utente {
         return true;
     }
 
+    /**
+     * Verifica se almeno uno dei posti indicati risulta gia occupato.
+     *
+     * @param proiezione proiezione da controllare.
+     * @param seats posti da verificare.
+     * @return true se almeno un posto e occupato.
+     */
     public boolean areSeatsOccupied(Proiezione proiezione, LinkedList<Posto> seats) {
         return hasOccupiedSeats(proiezione, seats);
     }
 
+    /**
+     * Verifica se almeno uno dei posti indicati non appartiene alla sala.
+     *
+     * @param proiezione proiezione da controllare.
+     * @param seats posti da verificare.
+     * @return true se almeno un posto non esiste.
+     */
     public boolean areSeatsInvalid(Proiezione proiezione, LinkedList<Posto> seats) {
         return hasInvalidSeats(proiezione, seats);
     }
@@ -129,6 +174,13 @@ public class Cliente extends Utente {
         return false;
     }
 
+    /**
+     * Sposta una prenotazione su un'altra proiezione dello stesso film.
+     *
+     * @param prenotazione prenotazione da spostare.
+     * @param nuovaProiezione nuova proiezione scelta.
+     * @return true se lo spostamento viene salvato.
+     */
     public boolean changeProiezione(Prenotazione prenotazione, Proiezione nuovaProiezione) {
         if (prenotazione == null || !bookings.contains(prenotazione)) {
             System.out.println("Prenotazione non trovata.");
@@ -176,6 +228,12 @@ public class Cliente extends Utente {
         return true;
     }
 
+    /**
+     * Cancella una prenotazione liberando i posti e aggiornando il file CSV.
+     *
+     * @param prenotazione prenotazione da annullare.
+     * @return true se la cancellazione viene completata.
+     */
     public boolean cancel(Prenotazione prenotazione) {
         if (prenotazione == null || !bookings.contains(prenotazione)) {
             System.out.println("Prenotazione non trovata.");
@@ -195,6 +253,11 @@ public class Cliente extends Utente {
         return true;
     }
 
+    /**
+     * Restituisce lo storico prenotazioni del cliente.
+     *
+     * @return lista delle prenotazioni associate allo username corrente.
+     */
     public LinkedList<Prenotazione> storico() {
         if (manager == null) {
             return new LinkedList<>(bookings);
@@ -203,6 +266,12 @@ public class Cliente extends Utente {
         return new LinkedList<>(bookings);
     }
 
+    /**
+     * Cerca una prenotazione nello storico del cliente per ID.
+     *
+     * @param id identificativo della prenotazione.
+     * @return prenotazione trovata, oppure null.
+     */
     public Prenotazione vediPrenotazione(int id) {
         for (Prenotazione prenotazione : storico()) {
             if (prenotazione.getId() == id) {
@@ -212,6 +281,12 @@ public class Cliente extends Utente {
         return null;
     }
 
+    /**
+     * Cerca proiezioni future il cui titolo contiene la stringa indicata.
+     *
+     * @param titolo testo da cercare nel titolo.
+     * @return lista di proiezioni compatibili.
+     */
     public LinkedList<Proiezione> searchProiezioniByTitle(String titolo) {
         LinkedList<Proiezione> risultati = new LinkedList<>();
         if (manager == null) {
@@ -225,6 +300,13 @@ public class Cliente extends Utente {
         return risultati;
     }
 
+    /**
+     * Cerca proiezioni future in una fascia di prezzo.
+     *
+     * @param minPrezzo prezzo minimo.
+     * @param maxPrezzo prezzo massimo.
+     * @return lista di proiezioni compatibili.
+     */
     public LinkedList<Proiezione> searchProiezioniByRange(double minPrezzo, double maxPrezzo) {
         LinkedList<Proiezione> risultati = new LinkedList<>();
         if (manager == null) {
@@ -239,6 +321,12 @@ public class Cliente extends Utente {
         return risultati;
     }
 
+    /**
+     * Cerca proiezioni future per genere.
+     *
+     * @param genere genere richiesto.
+     * @return lista di proiezioni compatibili.
+     */
     public LinkedList<Proiezione> searchProiezioniByGenre(String genere) {
         LinkedList<Proiezione> risultati = new LinkedList<>();
         if (manager == null) {
@@ -252,6 +340,11 @@ public class Cliente extends Utente {
         return risultati;
     }
 
+    /**
+     * Stampa la mappa della sala per una proiezione.
+     *
+     * @param proiezione proiezione da visualizzare.
+     */
     public void stampaMappa(Proiezione proiezione) {
         if (proiezione == null) {
             System.out.println("Proiezione non valida.");

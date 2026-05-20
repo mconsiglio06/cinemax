@@ -1407,7 +1407,6 @@ data_ora_proiezione,titolo_film,genere,regista,anno,durata_minuti,eta_minima,pre
 "2026-05-23 13:00:00",Apocalypto,Action,"Mel Gibson",2006,139,12,6.50
 "2026-05-23 10:30:00","Strangers on a Train",Crime,"Alfred Hitchcock",1951,101,12,8.00
 "2026-05-22 10:30:00","Before Sunrise",Drama,"Richard Linklater",1995,101,16,7.00
-"2026-05-21 10:30:00","Kal Ho Naa Ho",Comedy,"Nikkhil Advani",2003,186,0,8.50
 "2026-05-20 16:00:00","The Graduate",Comedy,"Mike Nichols",1967,106,12,8.00
 "2026-05-20 13:30:00","The Iron Giant",Animation,"Brad Bird",1999,86,6,6.50
 "2026-05-20 10:30:00","Star Wars",Action,"George Lucas",1977,121,12,7.50
@@ -8878,3 +8877,5 @@ data_ora_proiezione,titolo_film,genere,regista,anno,durata_minuti,eta_minima,pre
 "2018-01-01 10:30:00","Mr. Smith Goes to Washington",Comedy,"Frank Capra",1939,129,12,6.50
 "2028-06-22 13:00:00","Cristo si e' Fermato ad Eboli",Comedy,"Primo Levi",1989,192,12,9.0
 2034-05-30 10:00,Jordan,Comedy,Stanley Non Kubrick,2021,98,16,10.0
+2031-11-24 19:30,Grande Giove,Comedy,Cristoforo Scolombo,1971,192,13,14.0
+2026-05-21 22:30,Michael,Biografico,Matteo Consiglio,2026,127,12,14.0

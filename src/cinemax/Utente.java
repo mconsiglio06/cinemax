@@ -2,20 +2,47 @@ package cinemax;
 
 import java.util.LinkedList;
 
+/**
+ * Classe astratta base per tutti gli utenti dell'applicazione.
+ * Contiene dati anagrafici, credenziali, ruolo e stato della sessione.
+ */
 public abstract class Utente {
+    /** Nome dell'utente. */
     protected String nome;
+    /** Cognome dell'utente. */
     protected String cognome;
+    /** Username usato per l'accesso. */
     protected String username;
-    protected String password; // Nelle specifiche si parla di cifratura (vedremo dopo)
+    /** Password dell'utente nella sessione corrente. */
+    protected String password;
+    /** Data di nascita dell'utente. */
     protected Date dataNascita;
+    /** Luogo associato all'utente. */
     protected String luogo;
+    /** Ruolo applicativo dell'utente. */
     protected Ruolo ruolo;
+    /** Indica se l'utente ha privilegi amministrativi. */
     protected boolean isAdmin;
+    /** Indica se la sessione e attiva. */
     protected boolean isLogged;
     
     // Riferimento statico al Manager per salvare gli utenti
+    /** Manager condiviso per persistenza e operazioni di dominio. */
     protected static Manager manager;
 
+    /**
+     * Crea un utente generico.
+     *
+     * @param nome nome dell'utente.
+     * @param cognome cognome dell'utente.
+     * @param username username di accesso.
+     * @param password password in chiaro usata per la sessione corrente.
+     * @param dataNascita data di nascita.
+     * @param luogo luogo di nascita o residenza.
+     * @param ruolo ruolo applicativo.
+     * @param isAdmin true se l'utente ha privilegi amministrativi.
+     * @param isLogged true se la sessione parte gia attiva.
+     */
     public Utente(String nome, String cognome, String username, String password, 
                   Date dataNascita, String luogo, Ruolo ruolo, boolean isAdmin, boolean isLogged) {
         this.nome = nome;
@@ -157,71 +184,156 @@ public abstract class Utente {
 
 
     // GETTER E SETTER
+    /**
+     * Restituisce il nome dell'utente.
+     *
+     * @return nome dell'utente.
+     */
     public String getNome() {
         return nome;
     }
 
+    /**
+     * Imposta il nome dell'utente.
+     *
+     * @param nome nuovo nome dell'utente.
+     */
     public void setNome(String nome) {
         this.nome = nome;
     }
 
+    /**
+     * Restituisce il cognome dell'utente.
+     *
+     * @return cognome dell'utente.
+     */
     public String getCognome() {
         return cognome;
     }
 
+    /**
+     * Imposta il cognome dell'utente.
+     *
+     * @param cognome nuovo cognome dell'utente.
+     */
     public void setCognome(String cognome) {
         this.cognome = cognome;
     }
 
-    public String getUsername() { 
+    /**
+     * Restituisce lo username dell'utente.
+     *
+     * @return username dell'utente.
+     */
+    public String getUsername() {
         return username; 
     }
 
-    public void setUsername(String username) { 
+    /**
+     * Imposta lo username dell'utente.
+     *
+     * @param username nuovo username.
+     */
+    public void setUsername(String username) {
         this.username = username; 
     }
 
+    /**
+     * Restituisce la password dell'utente.
+     *
+     * @return password dell'utente.
+     */
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) { 
+    /**
+     * Imposta la password dell'utente.
+     *
+     * @param password nuova password.
+     */
+    public void setPassword(String password) {
         this.password = password; 
     }
 
+    /**
+     * Restituisce la data di nascita.
+     *
+     * @return data di nascita.
+     */
     public Date getDataNascita() {
         return dataNascita;
     }
 
+    /**
+     * Imposta la data di nascita.
+     *
+     * @param dataNascita nuova data di nascita.
+     */
     public void setDataNascita(Date dataNascita) {
         this.dataNascita = dataNascita;
     }
 
+    /**
+     * Restituisce il luogo associato all'utente.
+     *
+     * @return luogo associato all'utente.
+     */
     public String getLuogo() {
         return luogo;
     }
 
+    /**
+     * Imposta il luogo associato all'utente.
+     *
+     * @param luogo nuovo luogo associato all'utente.
+     */
     public void setLuogo(String luogo) {
         this.luogo = luogo;
     }
 
+    /**
+     * Restituisce il ruolo dell'utente.
+     *
+     * @return ruolo dell'utente.
+     */
     public Ruolo getRuolo() {
         return ruolo; 
     }
 
+    /**
+     * Imposta il ruolo dell'utente.
+     *
+     * @param ruolo nuovo ruolo dell'utente.
+     */
     public void setRuolo(Ruolo ruolo) {
         this.ruolo = ruolo;
     }
     
-    public boolean isAdmin() { 
+    /**
+     * Indica se l'utente e amministratore.
+     *
+     * @return true se l'utente e amministratore.
+     */
+    public boolean isAdmin() {
         return isAdmin; 
     }
 
+    /**
+     * Imposta lo stato amministrativo.
+     *
+     * @param admin nuovo stato amministrativo.
+     */
     public void setAdmin(boolean admin) {
         isAdmin = admin;
     }
 
-    public boolean isLogged() { 
+    /**
+     * Indica se l'utente risulta loggato.
+     *
+     * @return true se l'utente risulta loggato.
+     */
+    public boolean isLogged() {
         // Se l'utente è loggato, verifica che la sessione sia ancora valida
         if (this.isLogged) {
             return isSessionValid();
@@ -229,6 +341,11 @@ public abstract class Utente {
         return false;
     }
 
+    /**
+     * Imposta lo stato di login.
+     *
+     * @param logged nuovo stato di login.
+     */
     public void setLogged(boolean logged) {
         this.isLogged = logged;
     }
