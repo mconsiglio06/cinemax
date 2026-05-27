@@ -168,6 +168,6 @@ public class Prenotazione {
                "Data: " + proiezione.getDataProiezione() + " " + proiezione.getOraProiezione() + "\n" +
                "Posti: " + getNumPosti() + "\n" +
                "Lista posti: " + seatsText.toString().trim() + "\n" +
-               "Spesa totale: " + spesa + "€";
+               "Spesa totale: EUR " + String.format("%.2f", spesa);
     }
 }

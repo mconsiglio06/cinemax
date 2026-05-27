@@ -149,53 +149,24 @@ public class MainCinemax {
         String nome = leggiCampoSoloLettere("Nome", "Errore: un nome non puo contenere numeri o simboli, minimo 2 caratteri");
         String cognome = leggiCampoSoloLettere("Cognome", "Errore: un cognome non puo contenere numeri o simboli, minimo 2 caratteri");
         String username = leggiUsernameValido();
-
-        System.out.println("Ruolo: 1=Cliente, 2=Proiezionista, 3=Bigliettaio");
-        int ruoloScelta = readInt();
-        Ruolo ruolo;
-        switch (ruoloScelta) {
-            case 2:
-                ruolo = Ruolo.PROIEZIONISTA;
-                break;
-            case 3:
-                ruolo = Ruolo.BIGLIETTAIO;
-                break;
-            default:
-                ruolo = Ruolo.CLIENTE;
-                break;
-        }
-
-        String codiceRichiesto = getCodiceAccesso(ruolo);
-        if (codiceRichiesto != null) {
-            System.out.print("Inserisci il codice di accesso per " + ruolo + ": ");
-            String codice = sc.nextLine().trim();
-            if (!codice.equals(codiceRichiesto)) {
-                System.out.println("Codice di accesso non valido. Registrazione annullata.");
-                return;
-            }
-        }
-
+        Ruolo ruolo = Ruolo.CLIENTE;
         String password = leggiPasswordValida(username, ruolo);
         Date dataNascita = leggiDataNascitaValida();
         String luogo = leggiCampoSoloLettere("Luogo", "Errore: un luogo non puo contenere numeri o simboli, minimo 2 caratteri");
 
-        Utente utente;
-        switch (ruolo) {
-            case PROIEZIONISTA:
-                utente = new Proiezionista(nome, cognome, username, password, dataNascita, luogo);
-                break;
-            case BIGLIETTAIO:
-                utente = new Bigliettaio(nome, cognome, username, password, dataNascita, luogo);
-                break;
-            default:
-                utente = new Cliente(nome, cognome, username, password, dataNascita, luogo);
-                break;
-        }
+        Utente utente = new Cliente(nome, cognome, username, password, dataNascita, luogo);
         utente.signup();
         currentUser = utente;
         currentUser.login();
     }
 
+    /**
+     * Legge e valida la data di nascita inserita in registrazione.
+     * Il metodo ripete la richiesta finche il formato della data e corretto
+     * e l'utente risulta avere almeno 14 anni.
+     *
+     * @return data di nascita valida per la registrazione.
+     */
     private static Date leggiDataNascitaValida() {
         while (true) {
             System.out.print("Data di nascita (gg mm aaaa): ");
@@ -218,6 +189,13 @@ public class MainCinemax {
         }
     }
 
+    /**
+     * Verifica se una data di nascita identifica un utente minore di 14 anni.
+     * Il calcolo considera giorno e mese rispetto alla data odierna.
+     *
+     * @param dataNascita data di nascita da controllare.
+     * @return true se l'utente non ha ancora compiuto 14 anni.
+     */
     private static boolean isMinoreDi14Anni(Date dataNascita) {
         try {
             Date oggi = Date.today();
@@ -455,6 +433,13 @@ public class MainCinemax {
         System.out.println(renderSalaWithUserSeats(proiezione, null));
 
         if (cliente != null) {
+            int postiTotali = occupancy.length * occupancy[0].length;
+            if (postiOccupati >= postiTotali) {
+                System.out.println("Impossibile prenotare questa proiezione: tutti i posti sono occupati.");
+                System.out.print("Premi invio per tornare...");
+                sc.nextLine();
+                return;
+            }
             while (true) {
                 System.out.println("\nOpzioni:");
                 System.out.println("1 - Prenota questa proiezione");

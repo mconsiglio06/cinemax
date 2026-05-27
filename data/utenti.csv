@@ -1,31 +1,9 @@
 nome,cognome,username,password,giorno,mese,anno,luogo,ruolo
-Mario,Rossi,mipiaceilcinema1980,pass123,15,5,1980,Varese,PROIEZIONISTA
-Luigi,Cupero,stanleykubrick2,pass456,20,2,1985,Como,PROIEZIONISTA
-Marco,Bianchi,whitemark,pass789,30,11,1990,Varese,BIGLIETTAIO
-Sara,Casagrande,quartooggiarooo,pass101,10,4,1992,Milano,BIGLIETTAIO
-Anna,Gialli,yellow88,pass202,25,7,1988,Busto Arsizio,BIGLIETTAIO
-Luca,De Sanctis,luchinogalla,pass303,1,1,2000,Gallarate,BIGLIETTAIO
-Elena,Brognara,big5,pass404,12,12,1998,Varese,BIGLIETTAIO
-Paolo,Stagni,nonquellodellerane,pass505,20,6,2002,Arcisate,CLIENTE
-
-Matteo,Consiglio,mattcons2006,plsldfflrqrohqhuh,7,5,2006,Varese,CLIENTE
-Alberto,Medizza,albymedy06,qhjurglpphugd,1,1,1900,Varese,CLIENTE
-Jordan,Michelini,mchetumfaipaur,edvnhw,1,1,1900,Varese,CLIENTE
-Giulia,Casagrande,chincha1,edudjjlrsrol,13,11,2001,Viggiu',BIGLIETTAIO
-Donato,Consiglio,mche,pfkh5,12,12,1968,Mornago,CLIENTE
-Michele,Consiglio,mche3,pfkh7,10,12,1961,Oggiona Con Santo Stefano,BIGLIETTAIO
-2,1,2,4,1,1,1900,1,CLIENTE
-Jack,Sparrow,pirata,fduleehdqqljjd5,1,1,1900,America,BIGLIETTAIO
-Hamburger,Burgie,iiiaaa,lllddd,1,1,1900,jjja,PROIEZIONISTA
-Marco,Nero,tsbnohl,mxudphqw,1,1,1900,Varese,CLIENTE
-Edoardo,Della Torre,rodri05,vfrsrwhr38,3,2,2005,Morazzone,CLIENTE
-Alberto,Medizza,albe29,456vwhood,20,6,2006,Varese,CLIENTE
-Giulia,Casagrande,gozaimasu,orosuhgrl,1,1,1900,Baraggia,CLIENTE
-Maronn,Carmine,jojojo,mdmdmdmd456456,1,1,1900,Varese,PROIEZIONISTA
-Matteo,Consiglio,mc2006,fruwhvhphqwh,7,5,2006,Varese,CLIENTE
-Giulia,Casagrande,bighaus,fdvdjudqglvvlpd,13,11,2001,Varese,PROIEZIONISTA
-Valeria,Ferrigno,ferricorti,fruwhvhphqwhfulvsb,3,1,2003,Casale Monferrato,BIGLIETTAIO
-Anna Maria,Maccari,macca1971,pdffdul4204,6,7,1971,Varese,CLIENTE
-Donato,Consiglio,dicons68,pfkhwxpidlsdxu91,12,12,1968,Potenza,BIGLIETTAIO
-Edoardo,Della Torre,edothor05,vfrsrwhr38,3,2,2005,Morazzone,CLIENTE
-Matthew,Underaged,munder9,mdbfrohurpdq4,6,6,2010,Varese,CLIENTE
+Matteo,Consiglio,matteo.consiglio,FlqhpdVwdii5359,7,5,2006,Varese,PROIEZIONISTA
+Edoardo,Della Torre,edoardo.dellatorre,FlqhpdVwdii5359,3,2,2005,Varese,PROIEZIONISTA
+Valeria,Ferrigno,valeria.ferrigno,FlqhpdVwdii5359,3,1,2003,Varese,BIGLIETTAIO
+Giulia,Casagrande,giulia.casagrande,FlqhpdVwdii5359,13,11,2001,Varese,BIGLIETTAIO
+John,Doe,john.doe,FlqhpdVwdii5359,1,1,1990,Varese,BIGLIETTAIO
+Rosso,Malpelo,rosso.malpelo,FlqhpdVwdii5359,1,1,1990,Varese,BIGLIETTAIO
+Guido,Cavalcanti,guido.cavalcanti,FlqhpdVwdii5359,1,1,1990,Varese,BIGLIETTAIO
+Matteo,Consiglio,mcons6,eudcrui9,7,5,2006,Varese,CLIENTE

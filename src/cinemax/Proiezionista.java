@@ -128,7 +128,7 @@ public class Proiezionista extends Utente {
         System.out.println("=== Statistiche sala per proiezione ===");
         System.out.println("Film: " + proiezione.getFilm().getTitolo());
         System.out.println("Data: " + proiezione.getDataProiezione() + " " + proiezione.getOraProiezione());
-        System.out.println("Incasso totale: €" + incassoTotale);
+        System.out.println("Incasso totale: EUR " + String.format("%.2f", incassoTotale));
         System.out.println("Occupazione: " + postiOccupati + "/" + totalePosti + " (" + String.format("%.2f", percentuale) + "%)");
         System.out.println("Mappa posti:");
         int rowIndex = 0;
