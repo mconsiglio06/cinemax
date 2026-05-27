@@ -113,6 +113,11 @@ public class MainCinemax {
             registraLoginFallito();
             return;
         }
+        if (isMinoreDi14Anni(utente.getDataNascita())) {
+            System.out.println("Accesso negato: gli utenti minori di 14 anni non possono effettuare il login.");
+            registraLoginFallito();
+            return;
+        }
 
         String codiceRichiesto = getCodiceAccesso(utente.getRuolo());
         if (codiceRichiesto != null) {
@@ -171,31 +176,8 @@ public class MainCinemax {
         }
 
         String password = leggiPasswordValida(username, ruolo);
-        System.out.print("Data di nascita (gg mm aaaa, opzionale): ");
-        String inputData = sc.nextLine().trim();
+        Date dataNascita = leggiDataNascitaValida();
         String luogo = leggiCampoSoloLettere("Luogo", "Errore: un luogo non puo contenere numeri o simboli, minimo 2 caratteri");
-
-        Date dataNascita;
-        if (inputData.isEmpty()) {
-            try {
-                dataNascita = new Date(1, 1, 1900); // data di default per nascita opzionale
-            } catch (DateFormatException e) {
-                System.out.println("Errore nella data di default: " + e.getMessage());
-                return;
-            }
-        } else {
-            String[] parts = inputData.split("\\s+");
-            if (parts.length != 3) {
-                System.out.println("Formato data non valido. Usa gg mm aaaa.");
-                return;
-            }
-            try {
-                dataNascita = new Date(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-            } catch (NumberFormatException | DateFormatException e) {
-                System.out.println("Data di nascita non valida: " + e.getMessage());
-                return;
-            }
-        }
 
         Utente utente;
         switch (ruolo) {
@@ -212,6 +194,42 @@ public class MainCinemax {
         utente.signup();
         currentUser = utente;
         currentUser.login();
+    }
+
+    private static Date leggiDataNascitaValida() {
+        while (true) {
+            System.out.print("Data di nascita (gg mm aaaa): ");
+            String inputData = sc.nextLine().trim();
+            String[] parts = inputData.split("\\s+");
+            if (parts.length != 3) {
+                System.out.println("Errore: formato data non valido. Usa gg mm aaaa.");
+                continue;
+            }
+            try {
+                Date dataNascita = new Date(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+                if (isMinoreDi14Anni(dataNascita)) {
+                    System.out.println("Errore: gli utenti minori di 14 anni non possono registrarsi.");
+                    continue;
+                }
+                return dataNascita;
+            } catch (NumberFormatException | DateFormatException e) {
+                System.out.println("Errore: data di nascita non valida.");
+            }
+        }
+    }
+
+    private static boolean isMinoreDi14Anni(Date dataNascita) {
+        try {
+            Date oggi = Date.today();
+            int eta = oggi.getAnno() - dataNascita.getAnno();
+            if (oggi.getMese() < dataNascita.getMese()
+                    || (oggi.getMese() == dataNascita.getMese() && oggi.getGiorno() < dataNascita.getGiorno())) {
+                eta--;
+            }
+            return eta < 14;
+        } catch (DateFormatException e) {
+            return true;
+        }
     }
 
     private static String getCodiceAccesso(Ruolo ruolo) {
@@ -1158,7 +1176,6 @@ public class MainCinemax {
     }
 
     private static Proiezione chiediProiezioneDaInput(String titolo, int durata, Date data, Time ora) {
-        System.out.println("Titolo film: " + titolo);
         System.out.print("Genere: ");
         String genere = sc.nextLine().trim();
         System.out.print("Regista: ");
