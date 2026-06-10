@@ -44,7 +44,7 @@ public class Cliente extends Utente {
      * @return true se la prenotazione viene completata e salvata.
      */
     public boolean prenota(Proiezione proiezione, LinkedList<Posto> seats) {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per prenotare.");
             return false;
         }

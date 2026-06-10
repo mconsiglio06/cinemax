@@ -45,9 +45,9 @@ public class MainCinemax {
 
     private static void runApplication() {
         while (true) {
-            if (currentUser == null || !currentUser.isSessionValid()) {
+            if (currentUser == null || !currentUser.isLogged()) {
                 if (currentUser != null) {
-                    System.out.println("Sessione scaduta. Effettua nuovamente il login.");
+                    System.out.println("Utente non loggato. Effettua nuovamente il login.");
                     currentUser.logout();
                     currentUser = null;
                 }
@@ -859,7 +859,7 @@ public class MainCinemax {
     }
 
     private static void customerMenu(Cliente cliente) {
-        while (cliente.isSessionValid()) {
+        while (cliente.isLogged()) {
             System.out.println("\n--- Menu Cliente ---");
             System.out.println("1 - Cerca proiezioni");
             System.out.println("2 - Visualizza storico prenotazioni");
@@ -881,12 +881,12 @@ public class MainCinemax {
                     System.out.println("Scelta non valida.");
             }
         }
-        System.out.println("Sessione scaduta. Effettua il login nuovamente.");
+        System.out.println("Utente non loggato. Effettua il login nuovamente.");
         currentUser = null;
     }
 
     private static void proiezionistaMenu(Proiezionista proiezionista) {
-        while (proiezionista.isSessionValid()) {
+        while (proiezionista.isLogged()) {
             System.out.println("\n--- Menu Proiezionista ---");
             System.out.println("1 - Visualizza tutte le proiezioni");
             System.out.println("2 - Cerca proiezione");
@@ -925,7 +925,7 @@ public class MainCinemax {
                     System.out.println("Scelta non valida.");
             }
         }
-        System.out.println("Sessione scaduta. Effettua il login nuovamente.");
+        System.out.println("Utente non loggato. Effettua il login nuovamente.");
         currentUser = null;
     }
 
@@ -1289,7 +1289,7 @@ public class MainCinemax {
     }
 
     private static void bigliettaioMenu(Bigliettaio bigliettaio) {
-        while (bigliettaio.isSessionValid()) {
+        while (bigliettaio.isLogged()) {
             System.out.println("\n--- Menu Bigliettaio ---");
             System.out.println("1 - Vedi proiezioni giornaliere");
             System.out.println("2 - Cerca prenotazioni oggi");
@@ -1340,7 +1340,7 @@ public class MainCinemax {
                     System.out.println("Scelta non valida.");
             }
         }
-        System.out.println("Sessione scaduta. Effettua il login nuovamente.");
+        System.out.println("Utente non loggato. Effettua il login nuovamente.");
         currentUser = null;
     }
 

@@ -36,7 +36,7 @@ public class Proiezionista extends Utente {
      * @return true se l'aggiunta e completata.
      */
     public boolean aggiungiProiezione(Proiezione proiezione) {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per aggiungere una proiezione.");
             return false;
         }
@@ -58,7 +58,7 @@ public class Proiezionista extends Utente {
      * @return true se la rimozione e completata.
      */
     public boolean rimuoviProiezione(Proiezione proiezione) {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per rimuovere una proiezione.");
             return false;
         }
@@ -81,7 +81,7 @@ public class Proiezionista extends Utente {
      * @return true se la modifica e completata.
      */
     public boolean modificaProiezione(Proiezione originale, Proiezione aggiornata) {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per modificare una proiezione.");
             return false;
         }
@@ -102,7 +102,7 @@ public class Proiezionista extends Utente {
      * @param proiezione proiezione da analizzare.
      */
     public void visualizzaStatistiche(Proiezione proiezione) {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per visualizzare le statistiche.");
             return;
         }

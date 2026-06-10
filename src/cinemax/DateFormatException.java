@@ -14,7 +14,7 @@ package cinemax;
 /**
  * Eccezione lanciata quando una data non rispetta il formato o i limiti attesi.
  */
-public class DateFormatException extends RuntimeException {
+public class DateFormatException extends Exception {
     /**
      * Crea l'eccezione con messaggio standard per data non valida.
      */

@@ -37,7 +37,7 @@ public class Bigliettaio extends Utente {
      * Stampa le proiezioni programmate nella data odierna.
      */
     public void vediProiezioniGiornaliere() {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per visualizzare le proiezioni giornaliere.");
             return;
         }
@@ -66,7 +66,7 @@ public class Bigliettaio extends Utente {
      * Stampa le prenotazioni della data odierna.
      */
     public void searchPrenotazioni() {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per cercare prenotazioni.");
             return;
         }
@@ -96,7 +96,7 @@ public class Bigliettaio extends Utente {
      * @param cliente stringa di ricerca.
      */
     public void searchPrenotazioni(String cliente) {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per cercare prenotazioni.");
             return;
         }
@@ -122,7 +122,7 @@ public class Bigliettaio extends Utente {
      * @param id identificativo della prenotazione.
      */
     public void searchPrenotazioni(int id) {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per cercare prenotazioni.");
             return;
         }
@@ -145,7 +145,7 @@ public class Bigliettaio extends Utente {
      * @return totale incassato nella data odierna.
      */
     public double report() {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per visualizzare il report giornaliero.");
             return 0;
         }
@@ -169,7 +169,7 @@ public class Bigliettaio extends Utente {
      * @return true se l'annullamento e completato.
      */
     public boolean annulla(int idPrenotazione) {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per annullare una prenotazione.");
             return false;
         }
@@ -198,7 +198,7 @@ public class Bigliettaio extends Utente {
      * @return true se la vendita viene registrata.
      */
     public boolean venditaDiretta(Proiezione proiezione, LinkedList<Posto> postiScelti) {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per effettuare una vendita diretta.");
             return false;
         }
@@ -266,7 +266,7 @@ public class Bigliettaio extends Utente {
      * @param proiezione proiezione da visualizzare.
      */
     public void mappa(Proiezione proiezione) {
-        if (!isSessionValid()) {
+        if (!isLogged()) {
             System.out.println("Devi essere loggato per visualizzare la mappa.");
             return;
         }

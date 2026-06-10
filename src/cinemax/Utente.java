@@ -15,7 +15,7 @@ import java.util.LinkedList;
 
 /**
  * Classe astratta base per tutti gli utenti dell'applicazione.
- * Contiene dati anagrafici, credenziali, ruolo e stato della sessione.
+ * Contiene dati anagrafici, credenziali, ruolo e stato di login.
  */
 public abstract class Utente {
     /** Nome dell'utente. */
@@ -24,7 +24,7 @@ public abstract class Utente {
     protected String cognome;
     /** Username usato per l'accesso. */
     protected String username;
-    /** Password dell'utente nella sessione corrente. */
+    /** Password dell'utente durante l'esecuzione corrente. */
     protected String password;
     /** Data di nascita dell'utente. */
     protected Date dataNascita;
@@ -34,7 +34,7 @@ public abstract class Utente {
     protected Ruolo ruolo;
     /** Indica se l'utente ha privilegi amministrativi. */
     protected boolean isAdmin;
-    /** Indica se la sessione e attiva. */
+    /** Indica se l'utente e loggato. */
     protected boolean isLogged;
     
     // Riferimento statico al Manager per salvare gli utenti
@@ -47,12 +47,12 @@ public abstract class Utente {
      * @param nome nome dell'utente.
      * @param cognome cognome dell'utente.
      * @param username username di accesso.
-     * @param password password in chiaro usata per la sessione corrente.
+     * @param password password in chiaro usata durante l'esecuzione corrente.
      * @param dataNascita data di nascita.
      * @param luogo luogo di nascita o residenza.
      * @param ruolo ruolo applicativo.
      * @param isAdmin true se l'utente ha privilegi amministrativi.
-     * @param isLogged true se la sessione parte gia attiva.
+     * @param isLogged true se l'utente parte gia loggato.
      */
     public Utente(String nome, String cognome, String username, String password, 
                   Date dataNascita, String luogo, Ruolo ruolo, boolean isAdmin, boolean isLogged) {
@@ -184,15 +184,6 @@ public abstract class Utente {
         this.isLogged = false;
         System.out.println("Logout effettuato per: " + this.username);
     }
-
-    /**
-     * Verifica se la sessione è ancora valida
-     * @return true se l'utente è loggato
-     */
-    public boolean isSessionValid() {
-        return this.isLogged;
-    }
-
 
     // GETTER E SETTER
     /**
@@ -345,11 +336,7 @@ public abstract class Utente {
      * @return true se l'utente risulta loggato.
      */
     public boolean isLogged() {
-        // Se l'utente è loggato, verifica che la sessione sia ancora valida
-        if (this.isLogged) {
-            return isSessionValid();
-        }
-        return false;
+        return this.isLogged;
     }
 
     /**
