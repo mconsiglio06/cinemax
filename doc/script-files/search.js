@@ -63,7 +63,7 @@ const UNICODE_LETTER = 0;
 const UNICODE_DIGIT = 1;
 const UNICODE_OTHER = 2;
 function checkUnnamed(name, separator) {
-    return name === "Main" || !name ? "" : name + separator;
+    return name === "<Unnamed>" || !name ? "" : name + separator;
 }
 function escapeHtml(str) {
     return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -464,7 +464,7 @@ function getResultDescription(item) {
             var pkgName = checkUnnamed(item.indexItem.p, "");
             kind = itemDesc[item.indexItem.k || 12][0];
             if (!pkgName) {
-                // Handle "All Classes" summary page and Main
+                // Handle "All Classes" summary page and unnamed package
                 return item.indexItem.k === "18" ? kind : kind + " " + item.indexItem.l;
             }
             return getEnclosingDescription(kind, pkgDescLower, pkgName);

@@ -18,13 +18,20 @@ import java.util.Scanner;
  * Coordina login, registrazione, menu per ruoli e chiamate alle classi di dominio.
  */
 public class MainCinemax {
+    /** Scanner condiviso per la lettura da console. */
     private static final Scanner sc = new Scanner(System.in);
+
+    /** Gestore centrale per utenti, proiezioni e prenotazioni. */
     private static final Manager manager = new Manager();
+
+    /** Utente attualmente autenticato nell'applicazione. */
     private static Utente currentUser;
+
+    /** Numero di tentativi di login consecutivi non riusciti. */
     private static int tentativiLoginFalliti = 0;
 
     /**
-     * Costruttore privato: la classe espone solo metodi statici di avvio e menu.
+     * Costruttore privato per impedire l'istanziazione della classe di avvio.
      */
     private MainCinemax() {
     }
@@ -43,6 +50,9 @@ public class MainCinemax {
         sc.close();
     }
 
+    /**
+     * Esegue il ciclo principale dell'applicazione e indirizza l'utente al menu del proprio ruolo.
+     */
     private static void runApplication() {
         while (true) {
             if (currentUser == null || !currentUser.isLogged()) {
@@ -72,6 +82,9 @@ public class MainCinemax {
         }
     }
 
+    /**
+     * Mostra il menu iniziale per login, registrazione, accesso ospite o uscita.
+     */
     private static void showLoginMenu() {
         System.out.println("\n--- Menu principale ---");
         System.out.println("1 - Login");
@@ -102,6 +115,10 @@ public class MainCinemax {
                 break;
         }
     }
+
+    /**
+     * Gestisce l'autenticazione da console, inclusi controlli eta e codici per il personale.
+     */
     private static void login() {
         System.out.print("Username: ");
         String username = sc.nextLine().trim();
@@ -135,6 +152,9 @@ public class MainCinemax {
         tentativiLoginFalliti = 0;
     }
 
+    /**
+     * Registra un tentativo di login fallito e termina il programma dopo cinque errori consecutivi.
+     */
     private static void registraLoginFallito() {
         tentativiLoginFalliti++;
         System.out.println("Credenziali non valide. Riprova.");
@@ -144,6 +164,9 @@ public class MainCinemax {
         }
     }
 
+    /**
+     * Registra un nuovo utente cliente e lo autentica subito nell'applicazione.
+     */
     private static void registerCliente() {
         System.out.println("--- Registrazione ---");
         String nome = leggiCampoSoloLettere("Nome", "Errore: un nome non puo contenere numeri o simboli, minimo 2 caratteri");
@@ -210,6 +233,12 @@ public class MainCinemax {
         }
     }
 
+    /**
+     * Restituisce il codice di accesso richiesto per i ruoli del personale.
+     *
+     * @param ruolo ruolo per cui recuperare il codice.
+     * @return codice richiesto, oppure null se il ruolo non richiede codice.
+     */
     private static String getCodiceAccesso(Ruolo ruolo) {
         if (ruolo == Ruolo.PROIEZIONISTA) {
             return "CMXPRO2026";
@@ -220,6 +249,13 @@ public class MainCinemax {
         return null;
     }
 
+    /**
+     * Legge un campo testuale composto solo da lettere e spazi, ripetendo la richiesta finche valido.
+     *
+     * @param etichetta nome del campo da mostrare all'utente.
+     * @param messaggioErrore messaggio visualizzato in caso di input non valido.
+     * @return valore validato.
+     */
     private static String leggiCampoSoloLettere(String etichetta, String messaggioErrore) {
         while (true) {
             System.out.print(etichetta + ": ");
@@ -231,6 +267,11 @@ public class MainCinemax {
         }
     }
 
+    /**
+     * Legge uno username valido e non ancora presente nel file utenti.
+     *
+     * @return username disponibile.
+     */
     private static String leggiUsernameValido() {
         while (true) {
             System.out.print("Username: ");
@@ -247,6 +288,13 @@ public class MainCinemax {
         }
     }
 
+    /**
+     * Legge una password conforme ai requisiti del ruolo e diversa dallo username.
+     *
+     * @param username username scelto dall'utente.
+     * @param ruolo ruolo associato alla registrazione.
+     * @return password validata.
+     */
     private static String leggiPasswordValida(String username, Ruolo ruolo) {
         int lunghezzaMinima = getCodiceAccesso(ruolo) == null ? 8 : 14;
         while (true) {
@@ -268,6 +316,12 @@ public class MainCinemax {
         }
     }
 
+    /**
+     * Conta i caratteri alfabetici presenti in una stringa.
+     *
+     * @param valore stringa da analizzare.
+     * @return numero di lettere trovate.
+     */
     private static int contaLettere(String valore) {
         int count = 0;
         for (int i = 0; i < valore.length(); i++) {
@@ -278,6 +332,9 @@ public class MainCinemax {
         return count;
     }
 
+    /**
+     * Permette a un visitatore non autenticato di cercare proiezioni future.
+     */
     private static void cercaFilmOspite() {
         System.out.println("\n--- Ricerca film come ospite ---\n-- Scegli i filtri di ricerca --");
         System.out.println("1 - Titolo");
